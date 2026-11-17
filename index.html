@@ -412,9 +412,17 @@ function glyph(s,x,y,z){const h=z/2,w=Math.max(2.5,z*.14),C=T();let g;
 function mini(s,z=16){return`<svg width="${z+4}" height="${z+4}" viewBox="${-(z+4)/2} ${-(z+4)/2} ${z+4} ${z+4}" aria-hidden="true">${glyph(s,0,0,z)}</svg>`}
 
 /* ---------- rendering ---------- */
+/* Blank questions (no text, no notes, no branches) are thrown away once you leave them. */
+const isBlank=n=>!(n.text||"").trim()&&!(n.note||"").trim()&&!n.children.length;
+let lastSel=null;
+function dropIfBlank(id){const L=id&&locate(id);if(!L||!isBlank(L.node))return false;tombstone(L.node);L.list.splice(L.idx,1);return true}
+function pruneStale(list,maxAge){let c=0;for(let i=list.length-1;i>=0;i--){const n=list[i];c+=pruneStale(n.children,maxAge);
+  if(n.id!==sel&&isBlank(n)&&Date.now()-(n.u||0)>maxAge){tombstone(n);list.splice(i,1);c++}}return c}
 function render(){
   if(prefs.focus&&!focusRoot())prefs.focus="";
   const home=!prefs.focus;if(home)sel=null;
+  if(lastSel&&lastSel!==sel&&dropIfBlank(lastSel)){if(prefs.focus&&!focusRoot())return render();persistLocal();ghSchedule()}
+  lastSel=sel;
   $("#home").hidden=!home;$("#poster").style.display=home?"none":"";
   if(home)renderHome();else renderPoster();
   renderMast();renderInsp();fx.pop=fx.born=null;fx.selMoved=fx.chip=false}
@@ -761,6 +769,7 @@ document.addEventListener("keydown",e=>{
 });
 $("#add").onclick=addRoot;
 let rt;addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(()=>{if(prefs.focus)renderPoster()},150)});
+if(pruneStale(roots,10*60*1000))persistLocal();
 applyPrefs();render();setSave("local");initFile();initGh();
 if("serviceWorker" in navigator&&location.protocol!=="file:"&&!embedded)navigator.serviceWorker.register("sw.js").catch(()=>{});
 </script>
