@@ -157,6 +157,7 @@ svg .frame.slide{animation:frame .35s cubic-bezier(.2,.9,.3,1)}
 .ghbox summary{cursor:pointer;font-size:11.5px;font-weight:700;color:var(--ink-2);margin-bottom:6px}
 .ghbox small{font-weight:500;color:var(--grey);font-size:11px;line-height:1.4}
 .danger{border-color:#FF5A4E!important;color:#FF5A4E}
+.build{margin:0;font-size:11px;font-weight:600;color:var(--grey);text-align:right}
 .danger.armed{background:#FF5A4E;color:#fff}
 
 /* home: one tile per rabbit hole */
@@ -357,6 +358,7 @@ html.still *,html.still *::before,html.still *::after{animation:none!important;t
           <div class="datarow"><button class="tb primary" id="ghconnect">Connect</button><button class="tb" id="ghnow" hidden>Sync now</button><button class="tb" id="ghoff" hidden>Disconnect</button></div>
         </div>
       </div>
+      <p class="build" id="build"></p>
     </div>
   </section>
 
@@ -898,4 +900,20 @@ const shared=takeShare();
 applyPrefs();render();setSave("local");initFile();initGh();
 if(shared){ghSchedule(600);toast(shared.text?"Added from share. Edit it into a question.":"Added the link. Now write the question.");focusName()}
 if("serviceWorker" in navigator&&location.protocol!=="file:"&&!embedded)navigator.serviceWorker.register("sw.js").catch(()=>{});
+
+/* ---------- updates: BUILD changes on every release; a newer one on the server reloads the app ---------- */
+const BUILD="2026.11.18-9";
+$("#build").textContent="Version "+BUILD;
+async function checkUpdate(){
+  if(location.protocol==="file:"||embedded||!navigator.onLine)return;
+  let txt;try{const r=await fetch(location.pathname+"?build="+Date.now(),{cache:"no-store"});if(!r.ok)return;txt=await r.text()}catch(e){return}
+  const m=txt.match(/const BUILD="([^"]+)"/);if(!m||m[1]===BUILD)return;
+  const typing=document.activeElement&&document.activeElement.matches&&document.activeElement.matches("input,textarea");
+  let last=0;try{last=+sessionStorage.getItem("ig-reloaded")||0}catch(e){}
+  if(typing||Date.now()-last<60000){toast("A new version is ready",{label:"Reload",run:()=>location.reload()},15000);return}
+  try{sessionStorage.setItem("ig-reloaded",String(Date.now()))}catch(e){}
+  persistLocal();location.reload()}
+setTimeout(checkUpdate,1500);
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")checkUpdate()});
+setInterval(()=>{if(document.visibilityState==="visible")checkUpdate()},30*60*1000);
 </script>
