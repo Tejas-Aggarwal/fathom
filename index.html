@@ -1,6 +1,6 @@
 <!doctype html>
 <meta charset="utf-8">
-<title>Inquiry Grid</title>
+<title>Fathom</title>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="manifest" href="manifest.webmanifest">
@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#0F1B2E">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Inquiry Grid">
+<meta name="apple-mobile-web-app-title" content="Fathom">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -317,7 +317,7 @@ html.still *,html.still *::before,html.still *::after{animation:none!important;t
 
 <div class="app">
   <header class="mast">
-    <h1>Inquiry Grid<b>.</b></h1>
+    <h1>Fathom<b>.</b></h1>
     <div class="sum" id="sum"></div>
     <div class="tools">
       <button class="tb savebtn" id="savebtn" data-st="local" title="Saved"><i></i><span id="savetxt"></span></button>
@@ -787,7 +787,7 @@ function adopt(d){roots=d.roots;deleted=d.deleted||{};example=!!d.example;if(d.p
 function valid(d){return d&&Array.isArray(d.roots)}
 async function syncFromFile(){try{const txt=await(await handle.getFile()).text();
     if(!txt.trim()){await writeFile();return}
-    const d=JSON.parse(txt);if(!valid(d))throw new Error("not an Inquiry Grid file");
+    const d=JSON.parse(txt);if(!valid(d))throw new Error("not an Fathom file");
     if(localSavedAt&&d.savedAt&&localSavedAt>d.savedAt){await writeFile();toast("Saved your newer browser copy to "+handle.name)}
     else{adopt(d);lastWrite=new Date();setSave("saved")}
   }catch(e){fileOK=false;setSave("error");toast("Couldn't read "+(handle&&handle.name)+": "+e.message)}}
@@ -795,13 +795,13 @@ async function initFile(){if(!FS){setSave("local");return}
   handle=await IDB.get("handle");if(!handle){setSave("local");return}
   try{const p=await handle.queryPermission({mode:"readwrite"});if(p==="granted"){fileOK=true;await syncFromFile()}else setSave("reconnect")}catch(e){setSave("reconnect")}}
 async function reconnect(){try{const p=await handle.requestPermission({mode:"readwrite"});if(p==="granted"){fileOK=true;await syncFromFile();toast("Reconnected to "+handle.name)}}catch(e){toast("Couldn't reconnect: "+e.message)}}
-const types=[{description:"Inquiry Grid data",accept:{"application/json":[".json"]}}];
+const types=[{description:"Fathom data",accept:{"application/json":[".json"]}}];
 $("#choose").onclick=async()=>{try{const h=await showSaveFilePicker({suggestedName:"inquiry-grid.json",types});handle=h;fileOK=true;await IDB.set("handle",h);await writeFile();toast("Now autosaving to "+h.name)}catch(e){if(e.name!=="AbortError")toast("Couldn't use that file: "+e.message)}};
 $("#openf").onclick=async()=>{try{const[h]=await showOpenFilePicker({types});const p=await h.requestPermission({mode:"readwrite"});if(p!=="granted")return;handle=h;fileOK=true;await IDB.set("handle",h);localSavedAt="";await syncFromFile();toast("Opened "+h.name)}catch(e){if(e.name!=="AbortError")toast("Couldn't open that file: "+e.message)}};
 $("#forget").onclick=async()=>{handle=null;fileOK=false;await IDB.set("handle",undefined);setSave("local");toast("Stopped using the file. Saving in this browser only.")};
 $("#export").onclick=()=>{const blob=new Blob([JSON.stringify(payload(),replacer,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`inquiry-grid-${new Date().toISOString().slice(0,10)}.json`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000);toast("Exported a copy")};
 $("#import").onclick=()=>$("#importfile").click();
-$("#importfile").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;try{const d=JSON.parse(await f.text());if(!valid(d))throw new Error("not an Inquiry Grid file");adopt(d);save();toast("Imported "+f.name)}catch(err){toast("Couldn't import: "+err.message)}};
+$("#importfile").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;try{const d=JSON.parse(await f.text());if(!valid(d))throw new Error("not an Fathom file");adopt(d);save();toast("Imported "+f.name)}catch(err){toast("Couldn't import: "+err.message)}};
 $("#savebtn").onclick=()=>{
   if(ghOn()){if(ghState==="error")openPop(true);else sync();return}
   if(saveState==="reconnect"&&handle){reconnect();return}openPop(true)};
@@ -826,7 +826,7 @@ async function ghErr(r){let m="";try{m=(await r.json()).message||""}catch(e){}
 async function ghGet(){const r=await fetch(ghURL()+"?ref="+encodeURIComponent(gh.branch),{headers:ghHead(),cache:"no-store"});
   if(r.status===404){const rr=await fetch(`https://api.github.com/repos/${gh.repo}`,{headers:ghHead(),cache:"no-store"});if(!rr.ok)throw await ghErr(rr);return{sha:null,data:null}}
   if(!r.ok)throw await ghErr(r);
-  const j=await r.json();let data;try{data=JSON.parse(b64d(j.content||""))}catch(e){throw new Error(`${gh.path} in ${gh.repo} isn't Inquiry Grid data. Pick another file path.`)}
+  const j=await r.json();let data;try{data=JSON.parse(b64d(j.content||""))}catch(e){throw new Error(`${gh.path} in ${gh.repo} isn't Fathom data. Pick another file path.`)}
   return{sha:j.sha,data}}
 async function ghPut(data,sha){const body={message:`Sync from ${gh.device||"a device"}`,content:b64e(JSON.stringify(data,replacer,2)+"\n"),branch:gh.branch};if(sha)body.sha=sha;
   const r=await fetch(ghURL(),{method:"PUT",headers:{...ghHead(),"Content-Type":"application/json"},body:JSON.stringify(body)});
@@ -934,7 +934,7 @@ if(shared){ghSchedule(600);toast(shared.text?"Added from share. Edit it into a q
 if("serviceWorker" in navigator&&location.protocol!=="file:"&&!embedded)navigator.serviceWorker.register("sw.js").catch(()=>{});
 
 /* ---------- updates: BUILD changes on every release; a newer one on the server reloads the app ---------- */
-const BUILD="2026.11.18-11";
+const BUILD="2026.11.18-12";
 $("#build").textContent="Version "+BUILD;
 async function checkUpdate(){
   if(location.protocol==="file:"||embedded||!navigator.onLine)return;

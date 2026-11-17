@@ -1,4 +1,4 @@
-// Offline support for Inquiry Grid.
+// Offline support for Fathom.
 // Network first, so a new version shows up as soon as you're online;
 // the cached copy is only used when the network fails.
 // GitHub API calls are cross-origin and never touched here.
