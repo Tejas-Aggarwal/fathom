@@ -68,7 +68,13 @@ button{background:none;border:0;cursor:pointer;border-radius:0;-webkit-tap-highl
 @keyframes flash{40%{transform:scale(1.8) rotate(45deg)}}
 
 /* poster field */
-.field{flex:1;min-height:0;overflow:auto;position:relative;overscroll-behavior:contain;background:var(--paper)}
+.field{flex:1;min-height:0;overflow:auto;position:relative;overscroll-behavior:contain;background:var(--paper);touch-action:pan-x pan-y}
+.zoom{position:absolute;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:3;display:flex;background:var(--surface);border:2.5px solid var(--ink);box-shadow:4px 4px 0 var(--ink)}
+.zoom button{min-width:38px;height:36px;font-size:17px;font-weight:900;color:var(--ink);transition:transform .07s}
+.zoom button+button{border-left:2px solid var(--ink)}
+.zoom #zfit{font-size:12px;padding:0 10px}
+.zoom button:active{transform:scale(.88)}
+.zoom button:hover{background:var(--paper)}
 svg#poster{display:block}
 svg .nd{cursor:pointer}
 svg .nd:focus{outline:none}
@@ -180,6 +186,16 @@ svg .frame.slide{animation:frame .35s cubic-bezier(.2,.9,.3,1)}
 .strip i.s-parked{background:var(--grey);border-color:var(--grey)}
 .strip em{font-style:normal;font-size:10.5px;font-weight:700;color:var(--ink-2);line-height:9px}
 .tc{font-size:13px;font-weight:800;white-space:nowrap}
+.tile.fin{background:var(--paper);box-shadow:4px 4px 0 var(--grey);border-color:var(--grey)}
+.tile.fin .tn{color:transparent;-webkit-text-stroke:2px var(--grey)}
+.tile.fin .tt{color:var(--ink-2)}
+.tile.fin .tf{border-top-color:var(--grey)}
+.stamp{position:absolute;right:14px;bottom:44px;transform:rotate(-7deg);border:2.5px solid var(--a);color:var(--a);font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px}
+#cele{position:fixed;inset:0;z-index:65;display:grid;place-items:center;pointer-events:none}
+#cele .in{display:grid;justify-items:center;gap:8px;animation:cele 1.9s cubic-bezier(.2,.9,.3,1) forwards}
+#cele b{font-size:min(40vw,280px);font-weight:900;letter-spacing:-.07em;line-height:.8;color:var(--a)}
+#cele span{font-size:clamp(20px,4.5vw,34px);font-weight:900;letter-spacing:-.03em;color:var(--paper);background:var(--ink);padding:4px 12px;box-shadow:6px 6px 0 var(--a)}
+@keyframes cele{0%{transform:scale(.3) rotate(-10deg);opacity:0}16%{transform:scale(1.08) rotate(2deg);opacity:1}28%{transform:scale(1) rotate(0)}78%{opacity:1}100%{transform:scale(1.05);opacity:0}}
 .homeempty{font-size:15px;font-weight:700;color:var(--ink-2);line-height:1.5}
 .results{background:var(--surface);border:2.5px solid var(--ink);box-shadow:5px 5px 0 var(--ink);max-width:720px;padding:6px 0}
 .back{white-space:nowrap}
@@ -219,6 +235,18 @@ svg .frame.slide{animation:frame .35s cubic-bezier(.2,.9,.3,1)}
 .ib input{width:100%;border:0;border-bottom:3px solid var(--ink);background:transparent;padding:3px 0 7px;font-size:21px;font-weight:800;letter-spacing:-.025em;line-height:1.15;outline:none;transition:border-color .2s}
 .ib input:focus{border-bottom-color:var(--a)}
 .ib input::placeholder,.ib textarea::placeholder{color:var(--grey)}
+.links{display:flex;flex-wrap:wrap;gap:6px}
+.links:empty{display:none}
+.lk{display:inline-flex;align-items:stretch;border:2px solid var(--ink);background:var(--paper);font-size:12px;font-weight:800;max-width:100%;animation:pop .35s cubic-bezier(.34,1.8,.5,1)}
+.lk a{padding:5px 8px;color:var(--ink);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.lk a::after{content:" ↗";color:var(--a)}
+.lk a:hover{background:var(--a);color:var(--paper)}
+.lk a:hover::after{color:inherit}
+.lk button{padding:0 8px;border-left:2px solid var(--ink);font-weight:900;color:var(--ink-2)}
+.lk button:hover{color:#FF5A4E}
+.linkin{width:100%;height:36px;border:2px dashed var(--grey);background:transparent;padding:0 10px;font-size:13px;font-weight:600;color:var(--ink);outline:none}
+.linkin:focus{border-style:solid;border-color:var(--a)}
+.linkin::placeholder{color:var(--grey)}
 .ib textarea{width:100%;min-height:58px;resize:vertical;border:2px solid var(--ink);background:var(--paper);padding:8px 10px;font-size:13.5px;font-weight:500;line-height:1.45;outline:none}
 .ib textarea:focus{border-color:var(--a)}
 .chips{display:grid;grid-template-columns:repeat(4,1fr);border:2px solid var(--ink)}
@@ -244,6 +272,9 @@ kbd{font-family:var(--face);font-weight:800;font-size:10.5px;border:1.5px solid 
 #fx i{position:absolute;display:block}
 #toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:70;background:var(--ink);color:var(--paper);font-weight:800;font-size:13px;padding:9px 14px;box-shadow:4px 4px 0 var(--a);animation:toast .35s cubic-bezier(.2,.9,.3,1)}
 @keyframes toast{from{transform:translate(-50%,-140%)}}
+#toast{display:flex;align-items:center;gap:14px;max-width:calc(100% - 32px)}
+#toast span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#toast button{color:var(--a);font-weight:900;text-decoration:underline;text-underline-offset:3px;flex:none;padding:2px 0}
 ::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}
 .vt-wipe::view-transition-new(root){animation:wipein .6s cubic-bezier(.75,0,.2,1)}
 ::view-transition-group(hole){animation-duration:.42s;animation-timing-function:cubic-bezier(.2,.9,.3,1)}
@@ -260,6 +291,7 @@ html.still *,html.still *::before,html.still *::after{animation:none!important;t
   .long{display:none}
   .short{display:inline}
   .savebtn[data-st="saved"],.savebtn[data-st="local"]{display:none}
+  .app:has(.insp:not([hidden])) .zoom{display:none}
   .tiles{grid-template-columns:1fr;gap:16px}
   .tile{min-height:0}
   .tn{font-size:50px}
@@ -328,6 +360,8 @@ html.still *,html.still *::before,html.still *::after{animation:none!important;t
     </div>
   </section>
 
+  <div class="zoom" id="zoom" hidden><button id="zout" aria-label="Zoom out">−</button><button id="zfit" aria-label="Fit to screen">Fit</button><button id="zin" aria-label="Zoom in">+</button></div>
+
   <aside class="insp" id="insp" aria-live="polite"></aside>
 </div>
 <div id="fx" aria-hidden="true"></div>
@@ -347,7 +381,7 @@ const THEMES={
   concrete:{name:"Concrete",  paper:"#C6C4BE",surface:"#D3D1CB",ink:"#141414",ink2:"#393937",grey:"#7E7C76",hair:"#ADABA5",a:"#2340D8",dark:false}};
 const SPOTS=["#FFC23D","#FF5533","#FF8FB4","#C6F35E","#4FC3F7","#D3263A","#2340D8","#F2F0EA"];
 const newId=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
-const mk=(text,status="unexplored",children=[])=>({id:newId(),text,status,children,note:"",u:Date.now(),p:0});
+const mk=(text,status="unexplored",children=[])=>({id:newId(),text,status,children,note:"",links:[],u:Date.now(),p:0});
 const seed=()=>[
   mk("How does Amazon remember my cart if HTTP is stateless?","exploring",[
     mk("What is HTTP?","done",[mk("What's in a request vs a response?","done"),mk("What does \"stateless\" mean?","exploring")]),
@@ -373,12 +407,13 @@ const still=()=>!prefs.motion||matchMedia("(prefers-reduced-motion: reduce)").ma
 function reindex(){normalize(roots)}
 /*MERGE-START*/
 function normalize(list){(function walk(l){l.forEach((n,i)=>{n.id=String(n.id);if(!Array.isArray(n.children))n.children=[];if(!ORDER.includes(n.status))n.status="unexplored";
-  if(typeof n.text!=="string")n.text=String(n.text||"");if(typeof n.note!=="string")n.note="";if(typeof n.u!=="number")n.u=0;if(typeof n.p!=="number")n.p=i;walk(n.children)})})(list);return list}
+  if(typeof n.text!=="string")n.text=String(n.text||"");if(typeof n.note!=="string")n.note="";if(typeof n.u!=="number")n.u=0;if(typeof n.p!=="number")n.p=i;
+  if(!Array.isArray(n.links))n.links=[];walk(n.children)})})(list);return list}
 function nextPos(list){return list.reduce((m,n)=>Math.max(m,n.p||0),-1)+1}
-function flatten(list){const out=new Map();(function w(l,parent){for(const n of l){out.set(n.id,{id:n.id,parent,text:n.text,status:n.status,note:n.note||"",u:n.u||0,p:n.p||0});w(n.children,n.id)}})(list,null);return out}
+function flatten(list){const out=new Map();(function w(l,parent){for(const n of l){out.set(n.id,{id:n.id,parent,text:n.text,status:n.status,note:n.note||"",links:(n.links||[]).slice(),u:n.u||0,p:n.p||0});w(n.children,n.id)}})(list,null);return out}
 function build(recs){const all=new Map(recs.map(r=>[r.id,r])),kids=new Map();
   for(const r of recs){const par=r.parent&&all.has(r.parent)?r.parent:null;if(!kids.has(par))kids.set(par,[]);kids.get(par).push(r)}
-  const tree=par=>(kids.get(par)||[]).sort((a,b)=>a.p-b.p||(a.id<b.id?-1:a.id>b.id?1:0)).map(r=>({id:r.id,text:r.text,status:r.status,note:r.note,u:r.u,p:r.p,children:tree(r.id)}));
+  const tree=par=>(kids.get(par)||[]).sort((a,b)=>a.p-b.p||(a.id<b.id?-1:a.id>b.id?1:0)).map(r=>({id:r.id,text:r.text,status:r.status,note:r.note,links:r.links||[],u:r.u,p:r.p,children:tree(r.id)}));
   return tree(null)}
 // Per-question last-writer-wins merge. A deletion beats any edit made before it; an edit made after a deletion brings the question back.
 function mergeData(a,b){const A=flatten(a.roots||[]),B=flatten(b.roots||[]),del={...(a.deleted||{})};
@@ -413,7 +448,8 @@ function mini(s,z=16){return`<svg width="${z+4}" height="${z+4}" viewBox="${-(z+
 
 /* ---------- rendering ---------- */
 /* Blank questions (no text, no notes, no branches) are thrown away once you leave them. */
-const isBlank=n=>!(n.text||"").trim()&&!(n.note||"").trim()&&!n.children.length;
+const isBlank=n=>!(n.text||"").trim()&&!(n.note||"").trim()&&!(n.links&&n.links.length)&&!n.children.length;
+const mark=n=>(n.note?" ¶":"")+(n.links&&n.links.length?" ↗":"");
 let lastSel=null;
 function dropIfBlank(id){const L=id&&locate(id);if(!L||!isBlank(L.node))return false;tombstone(L.node);L.list.splice(L.idx,1);return true}
 function pruneStale(list,maxAge){let c=0;for(let i=list.length-1;i>=0;i--){const n=list[i];c+=pruneStale(n.children,maxAge);
@@ -435,16 +471,24 @@ function renderPoster(){
   let maxD=0;(function md(l,d){for(const n of l){maxD=Math.max(maxD,d);md(n.children,d+1)}})(shown,0);
   const treeW=maxD*ST+260;
   const OX=narrow?(prefs.huge?150:118):prefs.axis?Math.max(prefs.huge?320:250,Math.round((vw-treeW)/2/14)*14):(prefs.huge?318:224);
-  let y=0;const bands=[];
+  const IND=30,VX=34;// on phones the tree grows downward, indented by depth, label to the right
+  let y=0,maxX=0;const bands=[];
   shown.forEach((r,k)=>{const i=roots.indexOf(r);let leaf=0;const top=y;
+    if(narrow){let yy=top+H0-10;
+      (function placeV(n,d,code){n._x=VX+d*IND;n._code=code;maxX=Math.max(maxX,n._x);
+        const lx=n._x+(d?9:15)+12,chars=Math.max(12,Math.floor((vw-lx-16)/7.4));
+        n._lines=d?wrap((n.text||"Unnamed branch")+mark(n),chars,3):[];
+        n._y=yy;yy+=d?Math.max(52,n._lines.length*17+26):58;
+        n.children.forEach((c,j)=>placeV(c,d+1,code+"."+(j+1)))})(r,0,pad(i+1));
+      const h=yy-top+GAP;bands.push({r,i,k,top,h});y+=h;return}
     (function place(n,d,code){n._x=OX+d*ST;n._code=code;
       if(!n.children.length){n._y=top+H0+leaf*ROW;leaf++}
       else{n.children.forEach((c,k)=>place(c,d+1,code+"."+(k+1)));n._y=n.children[0]._y}})(r,0,pad(i+1));
     const h=H0+Math.max(leaf,1)*ROW+GAP;bands.push({r,i,k,top,h});y+=h});
-  const W=Math.max(vw,OX+maxD*ST+300),H=Math.max(vh,y+(window.innerWidth<760?260:200));
+  const W=narrow?Math.max(vw,maxX+170):Math.max(vw,OX+maxD*ST+300),H=Math.max(vh,y+(window.innerWidth<760?260:200));
   const ch=chain(sel),path=new Set(ch.map(n=>n.id)),selRoot=ch[0];
   let out="";
-  if(prefs.guides){
+  if(prefs.guides&&!narrow){
     const m=ST/2,x0=OX-9;let g="";
     for(let x=x0-Math.floor(x0/m)*m;x<W;x+=m)g+=`<line x1="${x}" y1="0" x2="${x}" y2="${H}" stroke="${C.ink}" stroke-opacity="${Math.abs(((x-x0)/ST)%1)<.01?.1:.05}"/>`;
     for(let yy=0;yy<H;yy+=ROW/4)g+=`<line x1="0" y1="${yy+.5}" x2="${W}" y2="${yy+.5}" stroke="${C.ink}" stroke-opacity=".032"/>`;
@@ -461,31 +505,37 @@ function renderPoster(){
     tl.forEach((l,k)=>g+=`<text class="rt nd-t" x="${OX-9}" y="${top+44+k*29}" data-id="${r.id}" fill="${C.ink}" style="cursor:pointer">${esc(l)}</text>`);
     if(t)g+=`<text class="rm" x="${OX-9}" y="${top+44+tl.length*29+2}" fill="${C.ink2}">${d} of ${t} done</text>`;
     let bars="",hot="";
-    (function walk(n){for(const c of n.children){const dd=poly(edgePts(n._x,n._y,c._x,c._y)),drawAttr=c.id===fx.born?` pathLength="1" class="draw"`:"";
-        if(path.has(c.id))hot+=`<path d="${dd}" stroke="${C.a}" stroke-width="8" fill="none" stroke-linejoin="miter" stroke-miterlimit="4"${drawAttr}/>`;
-        else bars+=`<path d="${dd}" stroke="${C.ink}" stroke-width="${n===r?8:6}" fill="none" stroke-linejoin="miter" stroke-miterlimit="4"${drawAttr}/>`;
+    (function walk(n){for(const c of n.children){const dd=poly(narrow?[[n._x,n._y],[n._x,c._y],[c._x,c._y]]:edgePts(n._x,n._y,c._x,c._y)),drawAttr=c.id===fx.born?` pathLength="1" class="draw"`:"";
+        if(path.has(c.id))hot+=`<path d="${dd}" stroke="${C.a}" stroke-width="${narrow?6:8}" fill="none" stroke-linejoin="miter" stroke-miterlimit="4"${drawAttr}/>`;
+        else bars+=`<path d="${dd}" stroke="${C.ink}" stroke-width="${narrow?(n===r?6:4.5):(n===r?8:6)}" fill="none" stroke-linejoin="miter" stroke-miterlimit="4"${drawAttr}/>`;
         walk(c)}})(r);
     g+=`<g class="bars" style="animation-delay:${Math.min(k,6)*110+120}ms">${bars}${hot}</g>`;
     (function nodes(n,isRoot){
       const x=n._x,yy=n._y,z=isRoot?30:18,on=n.id===sel,name=n.text||(isRoot?"Untitled question":"Unnamed branch");
       const cls="nd"+(n.id===fx.pop?" pop":"")+(n.id===fx.born?" born":"");
       let q=`<g class="${cls}" data-id="${n.id}" tabindex="0" role="button" aria-label="${esc(n._code+" "+name+", "+LABEL[n.status])}">`;
-      q+=`<rect class="hit" x="${x-z/2-8}" y="${yy-z/2-8}" width="${z+16}" height="${z+16}" fill="transparent"/>`;
+      q+=narrow&&!isRoot?`<rect class="hit" x="${x-z/2-8}" y="${yy-21}" width="${Math.max(60,vw-(x-z/2-8)-12)}" height="42" fill="transparent"/>`
+        :`<rect class="hit" x="${x-z/2-8}" y="${yy-z/2-8}" width="${z+16}" height="${z+16}" fill="transparent"/>`;
       if(on)q+=`<rect class="frame${fx.selMoved?" slide":""}" x="${x-z/2-7}" y="${yy-z/2-7}" width="${z+14}" height="${z+14}" fill="none" stroke="${C.a}" stroke-width="3"/>`;
       q+=glyph(n.status,x,yy,z);
-      if(on)q+=`<text class="arr${fx.selMoved?" slide":""}" x="${x-z/2-12}" y="${yy+z/2+34}" text-anchor="end" font-family="Inter Tight,Arial,sans-serif" font-weight="900" font-size="40" fill="${C.a}">→</text>`;
+      if(on&&!narrow)q+=`<text class="arr${fx.selMoved?" slide":""}" x="${x-z/2-12}" y="${yy+z/2+34}" text-anchor="end" font-family="Inter Tight,Arial,sans-serif" font-weight="900" font-size="40" fill="${C.a}">→</text>`;
       if(!isRoot){
-        const fill=n.status==="done"?C.ink2:n.status==="parked"?C.grey:C.ink,ls=wrap(name+(n.note?" ¶":""),24,2);
-        q+=`<text class="lb" x="${x-9}" y="0" fill="${fill}">`;
-        ls.forEach((l,k)=>{const by=yy-19-(ls.length-1-k)*16;
-          q+=`<tspan x="${x-9}" y="${by}">${esc(l)}</tspan>`});
-        q+=`</text>`;
+        const fill=on?C.a:n.status==="done"?C.ink2:n.status==="parked"?C.grey:C.ink;
+        if(narrow){const lx=x+z/2+12,ls=n._lines;
+          q+=`<text class="lb" x="${lx}" y="0" fill="${fill}">`;
+          ls.forEach((l,k)=>{q+=`<tspan x="${lx}" y="${yy+5-(ls.length-1)*8.5+k*17}">${esc(l)}</tspan>`});
+          q+=`</text>`;
+        }else{const ls=wrap(name+mark(n),24,2);
+          q+=`<text class="lb" x="${x-9}" y="0" fill="${fill}">`;
+          ls.forEach((l,k)=>{const by=yy-19-(ls.length-1-k)*16;
+            q+=`<tspan x="${x-9}" y="${by}">${esc(l)}</tspan>`});
+          q+=`</text>`}
       }
       q+=`</g>`;g+=q;n.children.forEach(c=>nodes(c,false))})(r,true);
     out+=g+`</g>`;
   });
   if(!roots.length)out+=`<text x="${Math.min(OX,40)}" y="110" class="rt" fill="${C.ink}">Nothing here yet.</text><text x="${Math.min(OX,40)}" y="140" class="rm" fill="${C.ink2}">Press + New question and write down the first thing you're curious about.</text>`;
-  const svg=$("#poster");svg.setAttribute("width",W);svg.setAttribute("height",H);svg.setAttribute("viewBox",`0 0 ${W} ${H}`);svg.innerHTML=out;
+  const svg=$("#poster");natW=W;natH=H;svg.setAttribute("width",W);svg.setAttribute("height",H);svg.setAttribute("viewBox",`0 0 ${W} ${H}`);svg.innerHTML=out;applyZoom();
   if(first){svg.classList.add("intro");first=false;setTimeout(()=>svg.classList.remove("intro"),1800)}
 }
 function counts(){const c={all:0,unexplored:0,exploring:0,done:0,parked:0};(function w(l){for(const n of l){c.all++;c[n.status]++;w(n.children)}})(roots);return c}
@@ -499,14 +549,15 @@ function tileHTML(r,k){const qs=below(r),{t,d}=tally(r),now=qs.find(n=>n.status=
   const sub=firstNote?esc(firstNote):now?`<b>Now</b> ${esc(now.text||"Untitled")}`:next?`<b>Next</b> ${esc(next.text||"Untitled")}`:t?"Everything here is explored.":"No branches yet. Open it and branch off.";
   const strip=qs.slice(0,40).map(n=>`<i class="s-${n.status}"></i>`).join("")+(qs.length>40?`<em>+${qs.length-40}</em>`:"");
   const touched=lastTouch(r);
-  return`<button class="tile${now||r.status==="exploring"?" live":""}" data-id="${r.id}" style="animation-delay:${Math.min(k,12)*45}ms">
+  const fin=isFinished(r);
+  return`<button class="tile${fin?" fin":now||r.status==="exploring"?" live":""}" data-id="${r.id}" style="animation-delay:${Math.min(k,12)*45}ms">${fin?`<span class="stamp">Explored</span>`:""}
     <span class="tn">${holeNo(r)}</span>${touched?`<span class="tw">${ago(new Date(touched))}</span>`:""}
     <span class="tt">${esc(r.text||"Untitled question")}</span><span class="ts">${sub}</span>
     <span class="tf"><span class="strip" aria-hidden="true">${strip}</span><span class="tc">${t?d+" of "+t+" done":""}</span></span></button>`}
 function renderHome(){const q=$("#homeq").value.trim().toLowerCase(),box=$("#tiles");
   $("#homebar").hidden=roots.length<=6&&!q;
   if(q){
-    const hits=[];(function w(l,rt){for(const n of l){const root=rt||n;if((n.text||"").toLowerCase().includes(q)||(n.note||"").toLowerCase().includes(q))hits.push({n,root});w(n.children,root)}})(roots,null);
+    const hits=[];(function w(l,rt){for(const n of l){const root=rt||n;if((n.text||"").toLowerCase().includes(q)||(n.note||"").toLowerCase().includes(q)||(n.links||[]).some(u=>u.toLowerCase().includes(q)))hits.push({n,root});w(n.children,root)}})(roots,null);
     const hl=s=>{const i=s.toLowerCase().indexOf(q);return i<0?esc(s):esc(s.slice(0,i))+"<mark>"+esc(s.slice(i,i+q.length))+"</mark>"+esc(s.slice(i+q.length))};
     box.className="results";
     box.innerHTML=hits.reverse().slice(0,200).map(({n,root})=>`<button class="ir" data-f="${root.id}" data-s="${root!==n?n.id:""}"><span class="n">${holeNo(root)}</span><span class="t">${hl(n.text||"Untitled")}${root!==n?`<small>${esc(root.text||"Untitled question")}</small>`:""}</span><span class="c">${mini(n.status,12)}</span></button>`).join("")
@@ -526,7 +577,7 @@ function vt(nameEl,update,cls){
   t.finished.then(clean,clean);
   setTimeout(()=>{if(!ran){try{t.skipTransition()}catch(e){}run();clean()}},400)}
 function openHole(id,selId,fromEl){
-  vt(fromEl,()=>{prefs.focus=id;persistLocal();sel=selId||null;fx.selMoved=!!selId;first=true;render();$("#field").style.viewTransitionName="hole";$("#field").scrollTo(0,0);if(selId)scrollTo(selId)})}
+  vt(fromEl,()=>{prefs.focus=id;zoom=1;markFit(false);persistLocal();sel=selId||null;fx.selMoved=!!selId;first=true;render();$("#field").style.viewTransitionName="hole";$("#field").scrollTo(0,0);if(selId)scrollTo(selId)})}
 function goHome(){const was=prefs.focus;if(!was)return;
   $("#field").style.viewTransitionName="hole";
   vt(null,()=>{$("#field").style.viewTransitionName="";prefs.focus="";sel=null;persistLocal();$("#homeq").value="";render();$("#field").scrollTo(0,0);
@@ -537,7 +588,7 @@ $("#homeq").oninput=renderHome;
 $("#homeq").onkeydown=e=>{if(e.key==="Enter"){const b=$("#tiles .ir");if(b)b.click()}};
 $("#back").onclick=goHome;
 
-function renderMast(){const c=counts(),fr=focusRoot();$("#back").hidden=!fr;
+function renderMast(){const c=counts(),fr=focusRoot();$("#back").hidden=!fr;$("#zoom").hidden=!fr;
   $("#sum").innerHTML=c.all?`<span><b>${c.all}</b> questions</span><span class="hot"><b>${c.exploring}</b> exploring</span><span><b>${c.done}</b> done</span>`:""}
 function renderInsp(){
   const box=$("#insp"),L=sel&&locate(sel);
@@ -549,6 +600,8 @@ function renderInsp(){
     <input id="name" aria-label="Question" autocomplete="off" placeholder="${isRoot?"What are you wondering about?":"What does this lead to?"}">
     <div class="chips" role="group" aria-label="Status">${ORDER.map(s=>`<button class="chip${fx.chip&&n.status===s?" just":""}" data-s="${s}" aria-pressed="${n.status===s}">${mini(s,14)}${LABEL[s]}</button>`).join("")}</div>
     <textarea id="note" aria-label="Notes" placeholder="Notes"></textarea>
+    <div class="links" id="links"></div>
+    <input id="linkin" class="linkin" type="url" inputmode="url" placeholder="Paste a link" autocomplete="off" spellcheck="false" aria-label="Add a link">
     <div class="acts"><button class="tb primary" id="branch">+ Branch</button><button class="tb del" id="del">Delete</button></div>
   </div>`;
   // Look the question up by id on every event: a sync may have swapped in fresh objects while this card is open.
@@ -558,6 +611,16 @@ function renderInsp(){
   inp.onkeydown=e=>{if(e.key==="Enter"||e.key==="Escape"){e.preventDefault();inp.blur()}};
   const nt=$("#note");nt.value=n.note||"";
   nt.oninput=()=>{const x=cur();if(!x)return;const had=!!x.note;x.note=nt.value;x.u=Date.now();save();if(had!==!!x.note)renderPoster()};
+  const drawLinks=()=>{const x=cur();if(!x)return;
+    $("#links").innerHTML=(x.links||[]).map((u,i)=>`<span class="lk"><a href="${esc(u)}" target="_blank" rel="noopener noreferrer" title="${esc(u)}">${esc(siteName(u))}</a><button data-i="${i}" aria-label="Remove link to ${esc(siteName(u))}">×</button></span>`).join("")};
+  drawLinks();
+  $("#links").onclick=e=>{const b=e.target.closest("button[data-i]");if(!b)return;const x=cur();if(!x)return;x.links.splice(+b.dataset.i,1);x.u=Date.now();save();drawLinks();renderPoster()};
+  const li=$("#linkin");
+  const addLink=()=>{const u=cleanURL(li.value);if(!u){if(li.value.trim())toast("That doesn't look like a link");return}
+    const x=cur();if(!x)return;if(!x.links.includes(u))x.links.push(u);x.u=Date.now();li.value="";save();drawLinks();renderPoster();buzz(10)};
+  li.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();addLink()}};
+  li.onpaste=()=>setTimeout(()=>{if(cleanURL(li.value))addLink()},0);
+  li.onblur=()=>{if(cleanURL(li.value))addLink()};
   box.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{const x=cur();if(x)setStatus(x,b.dataset.s)});
   $("#branch").onclick=()=>{const x=cur();if(x)addBranch(x)};
   $("#del").onclick=()=>{const x=cur();if(x)del(x)};
@@ -565,24 +628,63 @@ function renderInsp(){
 }
 function bindMin(){$("#min").onclick=()=>{prefs.mini=!prefs.mini;persistLocal();renderInsp()};$("#closeinsp").onclick=()=>{sel=null;render()}}
 
+/* ---------- zoom: pinch, ctrl+wheel, or the − Fit + buttons ---------- */
+let zoom=1,natW=0,natH=0;
+function applyZoom(){const s=$("#poster");s.style.width=natW*zoom+"px";s.style.height=natH*zoom+"px"}
+function setZoom(z,cx,cy){const f=$("#field");z=Math.min(2.5,Math.max(.3,z));if(Math.abs(z-zoom)<.001)return;
+  if(cx==null){cx=f.clientWidth/2;cy=f.clientHeight/2}
+  const px=(f.scrollLeft+cx)/zoom,py=(f.scrollTop+cy)/zoom;zoom=z;applyZoom();f.scrollLeft=px*zoom-cx;f.scrollTop=py*zoom-cy}
+function fitZoom(){const f=$("#field");return Math.min(1,(f.clientWidth-8)/natW,(f.clientHeight-8)/natH)}
+let fitted=false;
+function markFit(on){fitted=on;$("#zfit").textContent=on?"100%":"Fit";$("#zfit").setAttribute("aria-label",on?"Back to 100%":"Fit to screen")}
+$("#zin").onclick=()=>{setZoom(zoom*1.25);markFit(false)};
+$("#zout").onclick=()=>{setZoom(zoom/1.25);markFit(false)};
+$("#zfit").onclick=()=>{if(fitted){setZoom(1);markFit(false)}else{setZoom(fitZoom());$("#field").scrollTo(0,0);markFit(true)}};
+$("#field").addEventListener("wheel",e=>{if(!prefs.focus||!(e.ctrlKey||e.metaKey))return;e.preventDefault();
+  const r=$("#field").getBoundingClientRect();setZoom(zoom*Math.exp(-e.deltaY*.0025),e.clientX-r.left,e.clientY-r.top);markFit(false)},{passive:false});
+let pinch=null;
+const tdist=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
+$("#field").addEventListener("touchstart",e=>{if(e.touches.length===2&&prefs.focus){pinch={d:tdist(e.touches),z:zoom}}},{passive:true});
+$("#field").addEventListener("touchmove",e=>{if(!pinch||e.touches.length!==2)return;e.preventDefault();
+  const r=$("#field").getBoundingClientRect(),mx=(e.touches[0].clientX+e.touches[1].clientX)/2-r.left,my=(e.touches[0].clientY+e.touches[1].clientY)/2-r.top;
+  setZoom(pinch.z*tdist(e.touches)/pinch.d,mx,my);markFit(false)},{passive:false});
+$("#field").addEventListener("touchend",e=>{if(e.touches.length<2)pinch=null},{passive:true});
+
+/* ---------- links ---------- */
+function cleanURL(v){v=(v||"").trim();if(!v||/\s/.test(v))return"";if(!/^[a-z][a-z0-9+.-]*:/i.test(v)){if(!/^[\w-]+(\.[\w-]+)+(\/|$)/.test(v))return"";v="https://"+v}
+  try{const u=new URL(v);return/^https?:$/.test(u.protocol)?u.href:""}catch(e){return""}}
+const SITES={"developer.mozilla.org":"MDN","youtube.com":"YouTube","m.youtube.com":"YouTube","youtu.be":"YouTube","en.wikipedia.org":"Wikipedia","github.com":"GitHub","datatracker.ietf.org":"RFC","rfc-editor.org":"RFC","stackoverflow.com":"Stack Overflow","news.ycombinator.com":"Hacker News","jvns.ca":"Julia Evans","blog.cloudflare.com":"Cloudflare","iximiuz.com":"iximiuz"};
+function siteName(u){try{const h=new URL(u).hostname.replace(/^www\./,"");return SITES[h]||h}catch(e){return u}}
+
 /* ---------- actions ---------- */
 function focusName(){requestAnimationFrame(()=>{if(prefs.mini){prefs.mini=false;renderInsp()}const i=$("#name");if(i){i.focus();i.select()}})}
 function scrollTo(id){requestAnimationFrame(()=>{const L=locate(id);if(!L)return;const n=L.node,f=$("#field");
-  const vx=n._x-f.scrollLeft,vy=n._y-f.scrollTop;
-  if(vx<200||vx>f.clientWidth-140||vy<80||vy>f.clientHeight-300)f.scrollTo({left:Math.max(0,n._x-f.clientWidth/2+60),top:Math.max(0,n._y-f.clientHeight/2+40),behavior:still()?"auto":"smooth"})})}
+  const X=n._x*zoom,Y=n._y*zoom,vx=X-f.scrollLeft,vy=Y-f.scrollTop;
+  if(vx<200||vx>f.clientWidth-140||vy<80||vy>f.clientHeight-300)f.scrollTo({left:Math.max(0,X-f.clientWidth/2+60),top:Math.max(0,Y-f.clientHeight/2+40),behavior:still()?"auto":"smooth"})})}
 function select(id){fx.selMoved=id!==sel;sel=id;render();scrollTo(id)}
-function setStatus(n,s){const was=n.status;if(was===s)return;n.status=s;n.u=Date.now();fx.pop=n.id;fx.chip=true;save();render();
-  if(s==="done")requestAnimationFrame(()=>burstAt(n.id,{n:18,dist:78,size:7}));}
+function setStatus(n,s){const was=n.status;if(was===s)return;const root=chain(n.id)[0],before=root&&isFinished(root);
+  n.status=s;n.u=Date.now();fx.pop=n.id;fx.chip=true;save();render();
+  if(root&&!before&&isFinished(root)){setTimeout(()=>celebrate(root),120);return}
+  if(s==="done"){buzz([12,40,20]);setTimeout(()=>burstAt(n.id,{n:18,dist:78,size:7}),16)}}
 function addBranch(n){const c=mk("");c.p=nextPos(n.children);n.children.push(c);sel=c.id;fx.born=c.id;fx.selMoved=true;touched();save();render();scrollTo(c.id);focusName()}
 function addRoot(){const r=mk("");r.p=nextPos(roots);roots.push(r);prefs.focus=r.id;first=true;sel=r.id;fx.born=r.id;fx.selMoved=true;touched();save();render();scrollTo(r.id);focusName()}
 function tombstone(n){const t=Date.now();(function w(x){deleted[x.id]=t;x.children.forEach(w)})(n)}
 function del(n){if(!locate(n.id))return;
-  const finish=()=>{const L=locate(n.id);if(!L)return;tombstone(L.node);L.list.splice(L.idx,1);sel=L.parent?L.parent.id:(roots[Math.min(L.idx,roots.length-1)]||{}).id||null;fx.selMoved=true;save();render()};
+  const finish=()=>{const L=locate(n.id);if(!L)return;
+    const snap={node:JSON.parse(JSON.stringify(L.node,replacer)),parentId:L.parent?L.parent.id:null,idx:L.idx,focus:prefs.focus};
+    tombstone(L.node);L.list.splice(L.idx,1);sel=L.parent?L.parent.id:(roots[Math.min(L.idx,roots.length-1)]||{}).id||null;fx.selMoved=true;save();render();buzz(18);
+    const name=snap.node.text||"question";toast(`Deleted “${name.length>34?name.slice(0,33)+"…":name}”`,{label:"Undo",run:()=>undoDelete(snap)})};
   if(still()){finish();return}
   const ids=[];(function c(x){ids.push(x.id);x.children.forEach(c)})(n);
   burstAt(n.id,{n:10,dist:40,size:5,colors:[T().grey,T().ink]});
   ids.forEach(id=>{const g=document.querySelector(`.nd[data-id="${id}"]`);if(g)g.animate([{opacity:1,transform:"translateY(0)"},{opacity:0,transform:"translateY(14px)"}],{duration:220,easing:"ease-in",fill:"forwards"})});
   setTimeout(finish,210)}
+// Restoring marks every restored question as just edited, so it also wins over a deletion that already synced.
+function undoDelete(s){const now=Date.now();(function w(x){x.u=now;delete deleted[x.id];normalize([x]);x.children.forEach(w)})(s.node);
+  const P=s.parentId&&locate(s.parentId),list=P?P.node.children:roots;
+  list.splice(Math.min(s.idx,list.length),0,s.node);
+  if(s.focus)prefs.focus=s.focus;
+  sel=s.node.id;fx.pop=s.node.id;fx.selMoved=true;save();render();scrollTo(s.node.id);toast("Restored")}
 function touched(){if(example){example=false}}
 
 /* ---------- effects ---------- */
@@ -594,9 +696,24 @@ function burst(x,y,{n=7,dist=30,size=5,colors}={}){
     el.animate([{transform:"translate(0,0) rotate(0deg) scale(1)",opacity:1},{transform:`translate(${Math.cos(ang)*d}px,${Math.sin(ang)*d}px) rotate(${rot}deg) scale(.3)`,opacity:0}],
       {duration:460+Math.random()*260,easing:"cubic-bezier(.15,.8,.3,1)",fill:"forwards"}).onfinish=()=>el.remove()}}
 function burstAt(id,o){const g=document.querySelector(`.nd[data-id="${id}"] .gl`);if(!g)return;const r=g.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,o)}
-document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.nd,.nd-t");if(!b)return;
-  burst(e.clientX,e.clientY,b.matches(".nd,.nd-t")?{n:8,dist:30,size:5}:{n:6,dist:24,size:4})},{passive:true});
-let toastT;function toast(msg){let t=$("#toast");if(t)t.remove();t=document.createElement("div");t.id="toast";t.setAttribute("role","status");t.textContent=msg;document.body.append(t);clearTimeout(toastT);toastT=setTimeout(()=>t.remove(),2400)}
+// Small vibration on phone taps (Android; iPhones don't allow web pages to vibrate). Off with Motion: Still.
+function buzz(p){if(!prefs.motion||!navigator.vibrate)return;try{navigator.vibrate(p)}catch(e){}}
+document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.nd,.nd-t,.tile");if(!b)return;
+  if(e.pointerType==="touch")buzz(b.matches(".tile")?12:7);
+  if(!b.matches(".tile"))burst(e.clientX,e.clientY,b.matches(".nd,.nd-t")?{n:8,dist:30,size:5}:{n:6,dist:24,size:4})},{passive:true});
+/* A rabbit hole is finished when every question under it is done or parked, with at least one done. */
+function isFinished(r){const qs=below(r);return qs.length>0&&qs.every(n=>n.status==="done"||n.status==="parked")&&qs.some(n=>n.status==="done")}
+function celebrate(r){buzz([18,50,18,50,40]);
+  if(still()){toast(`Rabbit hole ${holeNo(r)} explored.`);return}
+  const o=document.createElement("div");o.id="cele";o.setAttribute("aria-hidden","true");
+  o.innerHTML=`<div class="in"><b>${holeNo(r)}</b><span>Explored.</span></div>`;document.body.append(o);
+  const cx=innerWidth/2,cy=innerHeight/2;burst(cx,cy,{n:34,dist:Math.min(innerWidth,innerHeight)*.42,size:10});
+  setTimeout(()=>burst(cx,cy,{n:20,dist:Math.min(innerWidth,innerHeight)*.3,size:7,colors:[T().ink,T().a]}),220);
+  setTimeout(()=>o.remove(),2000)}
+let toastT;function toast(msg,action,ms){let t=$("#toast");if(t)t.remove();t=document.createElement("div");t.id="toast";t.setAttribute("role","status");
+  const s=document.createElement("span");s.textContent=msg;t.append(s);
+  if(action){const b=document.createElement("button");b.textContent=action.label;b.onclick=()=>{t.remove();clearTimeout(toastT);action.run()};t.append(b)}
+  document.body.append(t);clearTimeout(toastT);toastT=setTimeout(()=>t.remove(),ms||(action?6000:2400))}
 
 /* ---------- saving: browser copy + optional file on disk ---------- */
 const embedded=(()=>{try{return window.self!==window.top}catch(e){return true}})();
@@ -770,6 +887,15 @@ document.addEventListener("keydown",e=>{
 $("#add").onclick=addRoot;
 let rt;addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(()=>{if(prefs.focus)renderPoster()},150)});
 if(pruneStale(roots,10*60*1000))persistLocal();
+// Shared from another app (Android share sheet): becomes a new rabbit hole with the link attached.
+function takeShare(){const q=new URLSearchParams(location.search);if(!["share_title","share_text","share_url"].some(k=>q.has(k)))return null;
+  let title=(q.get("share_title")||"").trim(),text=(q.get("share_text")||"").trim(),url=cleanURL(q.get("share_url"));
+  if(!url){const m=text.match(/https?:\/\/\S+/);if(m){url=cleanURL(m[0]);text=text.replace(m[0],"").trim()}}
+  try{history.replaceState(null,"",location.pathname)}catch(e){}
+  const r=mk(title||text||"");if(url)r.links=[url];if(title&&text&&text!==title)r.note=text;
+  r.p=nextPos(roots);roots.push(r);prefs.focus=r.id;sel=r.id;fx.born=r.id;touched();persistLocal();return r}
+const shared=takeShare();
 applyPrefs();render();setSave("local");initFile();initGh();
+if(shared){ghSchedule(600);toast(shared.text?"Added from share. Edit it into a question.":"Added the link. Now write the question.");focusName()}
 if("serviceWorker" in navigator&&location.protocol!=="file:"&&!embedded)navigator.serviceWorker.register("sw.js").catch(()=>{});
 </script>
