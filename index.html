@@ -153,6 +153,30 @@ svg .frame.slide{animation:frame .35s cubic-bezier(.2,.9,.3,1)}
 .danger{border-color:#FF5A4E!important;color:#FF5A4E}
 .danger.armed{background:#FF5A4E;color:#fff}
 
+/* rabbit-hole switcher */
+.idxbtn{display:flex;align-items:center;gap:7px;min-width:62px;justify-content:center}
+.short{display:none}
+.idx{position:absolute;top:12px;left:max(16px,env(safe-area-inset-left,0px));z-index:7;width:min(440px,calc(100% - 32px));max-height:calc(100% - 24px);display:flex;flex-direction:column;background:var(--surface);border-top:6px solid var(--ink);box-shadow:0 0 0 1px var(--ink),10px 10px 0 var(--a);animation:drop .32s cubic-bezier(.2,.9,.3,1)}
+.idxhead{display:flex;gap:8px;align-items:center;padding:10px;border-bottom:2px solid var(--ink)}
+.idxhead input{flex:1;min-width:0;height:38px;border:2px solid var(--ink);background:var(--paper);padding:0 10px;font-size:14px;font-weight:600;color:var(--ink);outline:none}
+.idxhead input:focus{border-color:var(--a)}
+.idxhead input::placeholder{color:var(--grey)}
+.idx .x{width:30px;height:30px;font-size:18px;font-weight:800;color:var(--ink);flex:none}
+.idxlist{overflow:auto;overscroll-behavior:contain;padding:6px 0}
+.ir{display:grid;grid-template-columns:46px 1fr auto;align-items:center;gap:10px;width:100%;padding:9px 12px;text-align:left;border-left:5px solid transparent;transition:background-color .12s,transform .12s}
+.ir:hover,.ir:focus-visible{background:var(--paper)}
+.ir:active{transform:translateX(3px)}
+.ir[aria-current="true"]{border-left-color:var(--a);background:var(--paper)}
+.ir .n{font-size:22px;font-weight:900;letter-spacing:-.05em;line-height:1}
+.ir[aria-current="true"] .n{color:var(--a)}
+.ir.all .n{font-size:15px;letter-spacing:-.02em}
+.ir .t{font-size:13.5px;font-weight:700;line-height:1.3;letter-spacing:-.01em;min-width:0;overflow-wrap:anywhere}
+.ir .t small{display:block;font-size:11px;font-weight:600;color:var(--grey);margin-top:2px}
+.ir .c{font-size:11.5px;font-weight:700;color:var(--ink-2);white-space:nowrap}
+.ir .c svg{display:block}
+.ir mark{background:var(--a);color:var(--paper);padding:0 1px}
+.idxempty{margin:0;padding:14px;font-size:13px;font-weight:600;color:var(--ink-2)}
+
 /* inspector */
 .insp{position:absolute;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:4;width:min(380px,calc(100% - 32px));max-height:calc(100% - 32px);overflow:auto;background:var(--surface);border-top:6px solid var(--a);box-shadow:0 0 0 1px var(--ink);animation:rise .3s cubic-bezier(.2,.9,.3,1)}
 @keyframes rise{from{transform:translateY(16px);opacity:0}}
@@ -212,6 +236,9 @@ html.still *,html.still *::before,html.still *::after{animation:none!important;t
   .sum{grid-column:1/-1;grid-row:2;font-size:12px}
   .tools{gap:8px;flex-wrap:nowrap}
   .long{display:none}
+  .short{display:inline}
+  .savebtn[data-st="saved"],.savebtn[data-st="local"]{display:none}
+  .idxbtn{min-width:52px}
   .tb{height:34px;padding:0 10px;font-size:12px}
   .ib input{font-size:18px}
   .chip{padding:7px 5px;font-size:10.5px}
@@ -225,7 +252,8 @@ html.still *,html.still *::before,html.still *::after{animation:none!important;t
     <div class="sum" id="sum"></div>
     <div class="tools">
       <button class="tb savebtn" id="savebtn" data-st="local" title="Saved"><i></i><span id="savetxt"></span></button>
-      <button class="tb" id="custom" aria-expanded="false">Customize</button>
+      <button class="tb idxbtn" id="idxbtn" aria-expanded="false" aria-haspopup="dialog" title="Jump to a rabbit hole ( / )"><span id="idxlabel">All</span><svg width="10" height="6" viewBox="0 0 10 6" aria-hidden="true"><path d="M0 0h10L5 6z" fill="currentColor"/></svg></button>
+      <button class="tb" id="custom" aria-expanded="false" aria-label="Customize"><span class="long">Customize</span><span class="short">⚙</span></button>
       <button class="tb primary" id="add" aria-label="New question">+ New<span class="long"> question</span></button>
     </div>
   </header>
@@ -269,6 +297,11 @@ html.still *,html.still *::before,html.still *::after{animation:none!important;t
         </div>
       </div>
     </div>
+  </section>
+
+  <section class="idx" id="idx" hidden aria-label="Rabbit holes">
+    <div class="idxhead"><input id="idxq" type="search" placeholder="Find a question…" autocomplete="off" spellcheck="false" aria-label="Find a question"><button class="x" id="closeidx" aria-label="Close">×</button></div>
+    <div class="idxlist" id="idxlist"></div>
   </section>
 
   <aside class="insp" id="insp" aria-live="polite"></aside>
@@ -360,15 +393,17 @@ function renderPoster(){
   const C=T(),f=$("#field"),vw=f.clientWidth||1200,vh=f.clientHeight||700;
   const narrow=vw<600;
   const ST=196,ROW=82,GAP=46,H0=narrow?196:prefs.huge?178:116,NUM=prefs.huge?(narrow?124:236):(narrow?84:118);
-  let maxD=0;(function md(l,d){for(const n of l){maxD=Math.max(maxD,d);md(n.children,d+1)}})(roots,0);
+  // Focus mode shows one rabbit hole; otherwise newest first, so new questions land at the top.
+  const fr=focusRoot(),shown=fr?[fr]:[...roots].reverse();
+  let maxD=0;(function md(l,d){for(const n of l){maxD=Math.max(maxD,d);md(n.children,d+1)}})(shown,0);
   const treeW=maxD*ST+260;
   const OX=narrow?(prefs.huge?150:118):prefs.axis?Math.max(prefs.huge?320:250,Math.round((vw-treeW)/2/14)*14):(prefs.huge?318:224);
   let y=0;const bands=[];
-  roots.forEach((r,i)=>{let leaf=0;const top=y;
+  shown.forEach((r,k)=>{const i=roots.indexOf(r);let leaf=0;const top=y;
     (function place(n,d,code){n._x=OX+d*ST;n._code=code;
       if(!n.children.length){n._y=top+H0+leaf*ROW;leaf++}
       else{n.children.forEach((c,k)=>place(c,d+1,code+"."+(k+1)));n._y=n.children[0]._y}})(r,0,pad(i+1));
-    const h=H0+Math.max(leaf,1)*ROW+GAP;bands.push({r,i,top,h});y+=h});
+    const h=H0+Math.max(leaf,1)*ROW+GAP;bands.push({r,i,k,top,h});y+=h});
   const W=Math.max(vw,OX+maxD*ST+300),H=Math.max(vh,y+(window.innerWidth<760?260:200));
   const ch=chain(sel),path=new Set(ch.map(n=>n.id)),selRoot=ch[0];
   let out="";
@@ -378,9 +413,9 @@ function renderPoster(){
     for(let yy=0;yy<H;yy+=ROW/4)g+=`<line x1="0" y1="${yy+.5}" x2="${W}" y2="${yy+.5}" stroke="${C.ink}" stroke-opacity=".032"/>`;
     out+=`<g aria-hidden="true">${g}</g>`;
   }
-  bands.forEach(({r,i,top})=>{
+  bands.forEach(({r,i,k,top})=>{
     const isSel=selRoot===r,col=isSel?C.a:C.ink,{t,d}=tally(r);
-    let g=`<g class="band" style="animation-delay:${i*110}ms">`;
+    let g=`<g class="band" style="animation-delay:${Math.min(k,6)*110}ms">`;
     g+=`<rect x="0" y="${top}" width="${W}" height="${isSel?7:2.5}" fill="${col}"/>`;
     const nb=top+(prefs.huge?NUM*.80:NUM*.84)+6;
     if(prefs.axis&&!narrow)g+=`<text class="num" x="${OX-46}" y="${nb}" text-anchor="end" font-size="${NUM}" fill="${col}">${pad(i+1)}</text>`;
@@ -393,7 +428,7 @@ function renderPoster(){
         if(path.has(c.id))hot+=`<path d="${dd}" stroke="${C.a}" stroke-width="8" fill="none" stroke-linejoin="miter" stroke-miterlimit="4"${drawAttr}/>`;
         else bars+=`<path d="${dd}" stroke="${C.ink}" stroke-width="${n===r?8:6}" fill="none" stroke-linejoin="miter" stroke-miterlimit="4"${drawAttr}/>`;
         walk(c)}})(r);
-    g+=`<g class="bars" style="animation-delay:${i*110+120}ms">${bars}${hot}</g>`;
+    g+=`<g class="bars" style="animation-delay:${Math.min(k,6)*110+120}ms">${bars}${hot}</g>`;
     (function nodes(n,isRoot){
       const x=n._x,yy=n._y,z=isRoot?30:18,on=n.id===sel,name=n.text||(isRoot?"Untitled question":"Unnamed branch");
       const cls="nd"+(n.id===fx.pop?" pop":"")+(n.id===fx.born?" born":"");
@@ -417,7 +452,35 @@ function renderPoster(){
   if(first){svg.classList.add("intro");first=false;setTimeout(()=>svg.classList.remove("intro"),1800)}
 }
 function counts(){const c={all:0,unexplored:0,exploring:0,done:0,parked:0};(function w(l){for(const n of l){c.all++;c[n.status]++;w(n.children)}})(roots);return c}
-function renderMast(){const c=counts();
+/* ---------- switcher: jump between rabbit holes, or search every question ---------- */
+function focusRoot(){return prefs.focus?roots.find(r=>r.id===prefs.focus)||null:null}
+const holeNo=r=>pad(roots.indexOf(r)+1);
+function setFocus(id,selId){prefs.focus=id||"";persistLocal();sel=selId||null;fx.selMoved=!!selId;first=true;closeIdx();render();
+  const f=$("#field");f.scrollTo({left:0,top:0});if(selId)scrollTo(selId)}
+function renderIdx(){const q=$("#idxq").value.trim().toLowerCase(),fr=focusRoot();let h="";
+  if(!q){
+    h=`<button class="ir all" data-f="" aria-current="${!fr}"><span class="n">All</span><span class="t">Every rabbit hole</span><span class="c">${roots.length}</span></button>`;
+    for(const r of [...roots].reverse()){const{t,d}=tally(r);
+      h+=`<button class="ir" data-f="${r.id}" aria-current="${fr===r}"><span class="n">${holeNo(r)}</span><span class="t">${esc(r.text||"Untitled question")}</span><span class="c">${t?d+"/"+t:""}</span></button>`}
+  }else{
+    const hits=[];(function w(l,rt){for(const n of l){const root=rt||n;if((n.text||"").toLowerCase().includes(q)||(n.note||"").toLowerCase().includes(q))hits.push({n,root});w(n.children,root)}})(roots,null);
+    const hl=s=>{const i=s.toLowerCase().indexOf(q);return i<0?esc(s):esc(s.slice(0,i))+"<mark>"+esc(s.slice(i,i+q.length))+"</mark>"+esc(s.slice(i+q.length))};
+    h=hits.reverse().slice(0,200).map(({n,root})=>`<button class="ir" data-f="${root.id}" data-s="${n.id}"><span class="n">${holeNo(root)}</span><span class="t">${hl(n.text||"Untitled")}${root!==n?`<small>${esc(root.text||"Untitled question")}</small>`:""}</span><span class="c">${mini(n.status,12)}</span></button>`).join("")
+      ||`<p class="idxempty">Nothing matches “${esc($("#idxq").value.trim())}”.</p>`;
+  }
+  $("#idxlist").innerHTML=h}
+function openIdx(){closePop();const p=$("#idx");p.hidden=false;$("#idxbtn").setAttribute("aria-expanded","true");$("#idxq").value="";renderIdx();
+  const cur=$("#idxlist .ir[aria-current=true]");if(cur)cur.scrollIntoView({block:"nearest"});
+  if(matchMedia("(hover: hover)").matches)requestAnimationFrame(()=>$("#idxq").focus())}
+function closeIdx(){$("#idx").hidden=true;$("#idxbtn").setAttribute("aria-expanded","false")}
+$("#idxbtn").onclick=()=>$("#idx").hidden?openIdx():closeIdx();
+$("#closeidx").onclick=closeIdx;
+$("#idxq").oninput=renderIdx;
+$("#idxq").onkeydown=e=>{if(e.key==="Enter"){const b=$("#idxlist .ir");if(b&&$("#idxq").value.trim())b.click()}else if(e.key==="ArrowDown"){const b=$("#idxlist .ir");if(b){e.preventDefault();b.focus()}}};
+$("#idxlist").onclick=e=>{const b=e.target.closest(".ir");if(b)setFocus(b.dataset.f,b.dataset.s||null)};
+$("#idxlist").onkeydown=e=>{if(e.key!=="ArrowDown"&&e.key!=="ArrowUp")return;const all=[...document.querySelectorAll("#idxlist .ir")],i=all.indexOf(document.activeElement);if(i<0)return;e.preventDefault();const t=all[i+(e.key==="ArrowDown"?1:-1)];if(t)t.focus();else if(e.key==="ArrowUp")$("#idxq").focus()};
+
+function renderMast(){const c=counts(),fr=focusRoot();$("#idxlabel").textContent=fr?holeNo(fr):"All";
   $("#sum").innerHTML=c.all?`<span><b>${c.all}</b> questions</span><span class="hot"><b>${c.exploring}</b> exploring</span><span><b>${c.done}</b> done</span>`:""}
 function renderInsp(){
   const box=$("#insp"),L=sel&&locate(sel);
@@ -454,7 +517,7 @@ function select(id){fx.selMoved=id!==sel;sel=id;render();scrollTo(id)}
 function setStatus(n,s){const was=n.status;if(was===s)return;n.status=s;n.u=Date.now();fx.pop=n.id;fx.chip=true;save();render();
   if(s==="done")requestAnimationFrame(()=>burstAt(n.id,{n:18,dist:78,size:7}));}
 function addBranch(n){const c=mk("");c.p=nextPos(n.children);n.children.push(c);sel=c.id;fx.born=c.id;fx.selMoved=true;touched();save();render();scrollTo(c.id);focusName()}
-function addRoot(){const r=mk("");r.p=nextPos(roots);roots.push(r);sel=r.id;fx.born=r.id;fx.selMoved=true;touched();save();render();scrollTo(r.id);focusName()}
+function addRoot(){const r=mk("");r.p=nextPos(roots);roots.push(r);if(prefs.focus)prefs.focus=r.id;sel=r.id;fx.born=r.id;fx.selMoved=true;touched();save();render();scrollTo(r.id);focusName()}
 function tombstone(n){const t=Date.now();(function w(x){deleted[x.id]=t;x.children.forEach(w)})(n)}
 function del(n){if(!locate(n.id))return;
   const finish=()=>{const L=locate(n.id);if(!L)return;tombstone(L.node);L.list.splice(L.idx,1);sel=L.parent?L.parent.id:(roots[Math.min(L.idx,roots.length-1)]||{}).id||null;fx.selMoved=true;save();render()};
@@ -625,7 +688,7 @@ $("#themes").onclick=e=>{const b=e.target.closest("button");if(b&&b.dataset.v!==
 $("#spots").onclick=e=>{const b=e.target.closest("button");if(b)restyle(()=>prefs.spot=b.dataset.v)};
 const opt=(id,k)=>$("#"+id).onclick=e=>{const b=e.target.closest("button");if(b){prefs[k]=b.dataset.v==="1";applyPrefs();save();render()}};
 opt("guides","guides");opt("huge","huge");opt("axis","axis");opt("motion","motion");
-function openPop(toData){const p=$("#pop");p.hidden=false;$("#custom").setAttribute("aria-expanded","true");if(toData)requestAnimationFrame(()=>$("#data").scrollIntoView({block:"nearest"}))}
+function openPop(toData){closeIdx();const p=$("#pop");p.hidden=false;$("#custom").setAttribute("aria-expanded","true");if(toData)requestAnimationFrame(()=>$("#data").scrollIntoView({block:"nearest"}))}
 function closePop(){$("#pop").hidden=true;$("#custom").setAttribute("aria-expanded","false")}
 $("#custom").onclick=()=>$("#pop").hidden?openPop():closePop();
 $("#closepop").onclick=closePop;
@@ -634,7 +697,8 @@ $("#closepop").onclick=closePop;
 $("#poster").addEventListener("click",e=>{const g=e.target.closest(".nd,.nd-t");if(g)select(g.dataset.id)});
 $("#poster").addEventListener("keydown",e=>{const g=e.target.closest&&e.target.closest(".nd");if(g&&e.key==="Enter"){e.preventDefault();select(g.dataset.id)}});
 document.addEventListener("keydown",e=>{
-  if(e.key==="Escape"){if(!$("#pop").hidden)closePop();else if(sel&&!(e.target.matches&&e.target.matches("input,textarea"))){sel=null;render()}}
+  if(e.key==="Escape"){if(!$("#idx").hidden)closeIdx();else if(!$("#pop").hidden)closePop();else if(sel&&!(e.target.matches&&e.target.matches("input,textarea"))){sel=null;render()}}
+  if(e.key==="/"&&!(e.target.matches&&e.target.matches("input,textarea"))){e.preventDefault();openIdx();return}
   if(!sel)return;const t=e.target;
   if(t.matches&&t.matches("input,textarea,select"))return;
   if(t!==document.body&&!(t.closest&&t.closest("#field")))return;
