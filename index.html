@@ -293,6 +293,8 @@ html.still *,html.still *::before,html.still *::after{animation:none!important;t
   .short{display:inline}
   .savebtn[data-st="saved"],.savebtn[data-st="local"]{display:none}
   .app:has(.insp:not([hidden])) .zoom{display:none}
+  body.inhole .mast h1{display:none}
+  body.inhole .tools{grid-column:1/-1;justify-content:flex-start}
   .tiles{grid-template-columns:1fr;gap:16px}
   .tile{min-height:0}
   .tn{font-size:50px}
@@ -311,6 +313,7 @@ html.still *,html.still *::before,html.still *::after{animation:none!important;t
     <div class="tools">
       <button class="tb savebtn" id="savebtn" data-st="local" title="Saved"><i></i><span id="savetxt"></span></button>
       <button class="tb back" id="back" hidden aria-label="Back to all questions">← All</button>
+      <button class="tb" id="edithole" hidden aria-label="Edit or delete this rabbit hole">Edit</button>
       <button class="tb" id="custom" aria-expanded="false" aria-label="Customize"><span class="long">Customize</span><span class="short">⚙</span></button>
       <button class="tb primary" id="add" aria-label="New question">+ New<span class="long"> question</span></button>
     </div>
@@ -343,7 +346,6 @@ html.still *,html.still *::before,html.still *::after{animation:none!important;t
         <div class="datarow">
           <button class="tb" id="export">Export copy</button>
           <button class="tb" id="import">Import</button>
-          <button class="tb danger" id="clear">Clear everything</button>
           <input type="file" id="importfile" accept=".json,application/json" hidden>
         </div>
         <div class="ghbox" id="ghbox">
@@ -589,8 +591,9 @@ $("#tiles").addEventListener("click",e=>{const t=e.target.closest(".tile");if(t)
 $("#homeq").oninput=renderHome;
 $("#homeq").onkeydown=e=>{if(e.key==="Enter"){const b=$("#tiles .ir");if(b)b.click()}};
 $("#back").onclick=goHome;
+$("#edithole").onclick=()=>{const fr=focusRoot();if(!fr)return;if(prefs.mini){prefs.mini=false;persistLocal()}select(fr.id)};
 
-function renderMast(){const c=counts(),fr=focusRoot();$("#back").hidden=!fr;$("#zoom").hidden=!fr;
+function renderMast(){const c=counts(),fr=focusRoot();document.body.classList.toggle("inhole",!!fr);$("#back").hidden=!fr;$("#zoom").hidden=!fr;$("#edithole").hidden=!fr||sel===fr.id;
   $("#sum").innerHTML=c.all?`<span><b>${c.all}</b> questions</span><span class="hot"><b>${c.exploring}</b> exploring</span><span><b>${c.done}</b> done</span>`:""}
 function renderInsp(){
   const box=$("#insp"),L=sel&&locate(sel);
@@ -604,7 +607,7 @@ function renderInsp(){
     <textarea id="note" aria-label="Notes" placeholder="Notes"></textarea>
     <div class="links" id="links"></div>
     <input id="linkin" class="linkin" type="url" inputmode="url" placeholder="Paste a link" autocomplete="off" spellcheck="false" aria-label="Add a link">
-    <div class="acts"><button class="tb primary" id="branch">+ Branch</button><button class="tb del" id="del">Delete</button></div>
+    <div class="acts"><button class="tb primary" id="branch">+ Branch</button><button class="tb del" id="del">${isRoot?"Delete rabbit hole":"Delete"}</button></div>
   </div>`;
   // Look the question up by id on every event: a sync may have swapped in fresh objects while this card is open.
   const id=n.id,cur=()=>{const x=locate(id);return x&&x.node};
@@ -768,8 +771,6 @@ $("#forget").onclick=async()=>{handle=null;fileOK=false;await IDB.set("handle",u
 $("#export").onclick=()=>{const blob=new Blob([JSON.stringify(payload(),replacer,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`inquiry-grid-${new Date().toISOString().slice(0,10)}.json`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000);toast("Exported a copy")};
 $("#import").onclick=()=>$("#importfile").click();
 $("#importfile").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;try{const d=JSON.parse(await f.text());if(!valid(d))throw new Error("not an Inquiry Grid file");adopt(d);save();toast("Imported "+f.name)}catch(err){toast("Couldn't import: "+err.message)}};
-let armT;$("#clear").onclick=()=>{const b=$("#clear");if(!b.classList.contains("armed")){b.classList.add("armed");b.textContent="Press again to clear";clearTimeout(armT);armT=setTimeout(()=>{b.classList.remove("armed");b.textContent="Clear everything"},3000);return}
-  clearTimeout(armT);b.classList.remove("armed");b.textContent="Clear everything";roots.forEach(tombstone);roots=[];example=false;sel=null;save();render();toast("Cleared. A fresh grid.")};
 $("#savebtn").onclick=()=>{
   if(ghOn()){if(ghState==="error")openPop(true);else sync();return}
   if(saveState==="reconnect"&&handle){reconnect();return}openPop(true)};
@@ -902,7 +903,7 @@ if(shared){ghSchedule(600);toast(shared.text?"Added from share. Edit it into a q
 if("serviceWorker" in navigator&&location.protocol!=="file:"&&!embedded)navigator.serviceWorker.register("sw.js").catch(()=>{});
 
 /* ---------- updates: BUILD changes on every release; a newer one on the server reloads the app ---------- */
-const BUILD="2026.11.18-9";
+const BUILD="2026.11.18-10";
 $("#build").textContent="Version "+BUILD;
 async function checkUpdate(){
   if(location.protocol==="file:"||embedded||!navigator.onLine)return;
