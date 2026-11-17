@@ -3,6 +3,14 @@
 <title>Inquiry Grid</title>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="claude:viewport-fit-sides" content="cover">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#0F1B2E">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Inquiry Grid">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800;900&display=swap">
@@ -23,7 +31,7 @@ button{background:none;border:0;cursor:pointer;border-radius:0;-webkit-tap-highl
 .app{height:100%;display:flex;flex-direction:column;position:relative}
 
 /* masthead */
-.mast{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px 28px;padding-block:14px 12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));border-bottom:6px solid var(--ink);background:var(--paper);position:relative;z-index:3}
+.mast{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px 28px;padding-block:calc(14px + env(safe-area-inset-top,0px)) 12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));border-bottom:6px solid var(--ink);background:var(--paper);position:relative;z-index:3}
 .mast h1{margin:0;font-weight:900;font-size:34px;line-height:1;letter-spacing:-.045em;white-space:nowrap}
 .sum{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:13px;font-weight:600;color:var(--ink-2);min-width:0}
 .sum b{color:var(--ink);font-weight:800}
@@ -199,7 +207,7 @@ html.still *,html.still *::before,html.still *::after{animation:none!important;t
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 
 @media (max-width:760px){
-  .mast{grid-template-columns:1fr auto;padding-block:10px 8px;border-bottom-width:5px}
+  .mast{grid-template-columns:1fr auto;padding-block:calc(10px + env(safe-area-inset-top,0px)) 8px;border-bottom-width:5px}
   .mast h1{font-size:25px}
   .sum{grid-column:1/-1;grid-row:2;font-size:12px}
   .tools{gap:8px;flex-wrap:nowrap}
@@ -639,4 +647,5 @@ document.addEventListener("keydown",e=>{
 $("#add").onclick=addRoot;
 let rt;addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(renderPoster,150)});
 applyPrefs();render();setSave("local");initFile();initGh();
+if("serviceWorker" in navigator&&location.protocol!=="file:"&&!embedded)navigator.serviceWorker.register("sw.js").catch(()=>{});
 </script>
