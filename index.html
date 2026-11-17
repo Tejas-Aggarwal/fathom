@@ -361,7 +361,7 @@ html.still *,html.still *::before,html.still *::after{animation:none!important;t
           <b>GitHub sync</b>
           <div class="ghst" id="ghst"></div>
           <div class="ghform" id="ghform">
-            <label for="ghrepo">Private repository<input id="ghrepo" placeholder="your-name/inquiry-grid-data" autocomplete="off" spellcheck="false"></label>
+            <label for="ghrepo">Private repository<input id="ghrepo" placeholder="your-name/fathom-data" autocomplete="off" spellcheck="false"></label>
             <label for="ghdev">This device's name<input id="ghdev" placeholder="laptop" autocomplete="off"></label>
             <label for="ghtok">Access token<input id="ghtok" type="password" placeholder="github_pat_…" autocomplete="off" spellcheck="false"></label>
             <details><summary>File and branch</summary><label for="ghpath">File path<input id="ghpath" autocomplete="off" spellcheck="false"></label><label for="ghbranch">Branch<input id="ghbranch" autocomplete="off" spellcheck="false"></label></details>
@@ -836,11 +836,18 @@ function applyMerged(m){roots=normalize(m.roots);deleted=m.deleted;if(sel&&!loca
   const typing=document.activeElement&&document.activeElement.closest&&document.activeElement.closest("#insp");
   if(prefs.focus&&!focusRoot()){prefs.focus="";render();return}
   if(prefs.focus)renderPoster();else renderHome();renderMast();if(!typing)renderInsp()}
+// If the data repo was renamed on GitHub, the old name still answers with the repo's new full name.
+// Switch to it once per session, so every device follows a rename without being reconnected.
+let renameChecked=false;
+async function followRename(){if(renameChecked)return;renameChecked=true;
+  try{const r=await fetch(`https://api.github.com/repos/${gh.repo}`,{headers:ghHead(),cache:"no-store"});if(!r.ok)return;
+    const full=(await r.json()).full_name;if(full&&full.toLowerCase()!==gh.repo.toLowerCase()){gh.repo=full;ghSaveCfg();toast("Sync now uses "+full)}}catch(e){}}
 async function sync(){if(!ghOn())return;if(syncing){syncAgain=true;return}
   clearTimeout(syncT);
   if(!navigator.onLine){ghState="offline";paintSave();return}
   syncing=true;ghState="syncing";paintSave();
   try{
+    await followRename();
     for(let i=0;i<3;i++){
       const{sha,data}=await ghGet();
       const remote=data&&valid(data)?{roots:normalize(data.roots),deleted:data.deleted||{}}:{roots:[],deleted:{}};
@@ -934,7 +941,7 @@ if(shared){ghSchedule(600);toast(shared.text?"Added from share. Edit it into a q
 if("serviceWorker" in navigator&&location.protocol!=="file:"&&!embedded)navigator.serviceWorker.register("sw.js").catch(()=>{});
 
 /* ---------- updates: BUILD changes on every release; a newer one on the server reloads the app ---------- */
-const BUILD="2026.11.18-12";
+const BUILD="2026.11.18-13";
 $("#build").textContent="Version "+BUILD;
 async function checkUpdate(){
   if(location.protocol==="file:"||embedded||!navigator.onLine)return;
