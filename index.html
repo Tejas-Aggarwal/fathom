@@ -157,6 +157,15 @@ svg .frame.slide{animation:frame .35s cubic-bezier(.2,.9,.3,1)}
 .ghbox summary{cursor:pointer;font-size:11.5px;font-weight:700;color:var(--ink-2);margin-bottom:6px}
 .ghbox small{font-weight:500;color:var(--grey);font-size:11px;line-height:1.4}
 .danger{border-color:#FF5A4E!important;color:#FF5A4E}
+.modal{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:color-mix(in srgb,var(--paper) 70%,transparent);backdrop-filter:blur(3px);animation:fade .2s both}
+.sheet{width:min(420px,100%);background:var(--surface);border-top:8px solid #FF5A4E;box-shadow:0 0 0 1.5px var(--ink),10px 10px 0 var(--ink);padding:18px 18px 16px;display:grid;gap:12px;animation:rise .3s cubic-bezier(.2,.9,.3,1)}
+.sheet h3{margin:0;font-size:22px;font-weight:900;letter-spacing:-.03em;line-height:1.1}
+.sheet p{margin:0;font-size:14px;font-weight:600;line-height:1.45;color:var(--ink-2)}
+.sheet p b{color:var(--ink);font-weight:800}
+.sheet .acts{display:flex;gap:10px;margin-top:4px}
+.sheet .acts .tb{flex:1}
+.tb.danger-fill{background:#FF5A4E;border-color:#FF5A4E;color:#fff}
+.tb.danger-fill:hover{background:#e04639;border-color:#e04639}
 .build{margin:0;font-size:11px;font-weight:600;color:var(--grey);text-align:right}
 .danger.armed{background:#FF5A4E;color:#fff}
 
@@ -367,6 +376,14 @@ html.still *,html.still *::before,html.still *::after{animation:none!important;t
   <div class="zoom" id="zoom" hidden><button id="zout" aria-label="Zoom out">−</button><button id="zfit" aria-label="Fit to screen">Fit</button><button id="zin" aria-label="Zoom in">+</button></div>
 
   <aside class="insp" id="insp" aria-live="polite"></aside>
+
+  <div class="modal" id="confirm" hidden>
+    <div class="sheet" role="alertdialog" aria-modal="true" aria-labelledby="cft" aria-describedby="cfd">
+      <h3 id="cft"></h3>
+      <p id="cfd"></p>
+      <div class="acts"><button class="tb" id="cfno">Keep it</button><button class="tb danger-fill" id="cfyes">Delete</button></div>
+    </div>
+  </div>
 </div>
 <div id="fx" aria-hidden="true"></div>
 
@@ -628,7 +645,7 @@ function renderInsp(){
   li.onblur=()=>{if(cleanURL(li.value))addLink()};
   box.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{const x=cur();if(x)setStatus(x,b.dataset.s)});
   $("#branch").onclick=()=>{const x=cur();if(x)addBranch(x)};
-  $("#del").onclick=()=>{const x=cur();if(x)del(x)};
+  $("#del").onclick=()=>{const x=cur();if(x)requestDelete(x)};
   bindMin();
 }
 function bindMin(){$("#min").onclick=()=>{prefs.mini=!prefs.mini;persistLocal();renderInsp()};$("#closeinsp").onclick=()=>{sel=null;render()}}
@@ -673,6 +690,20 @@ function setStatus(n,s){const was=n.status;if(was===s)return;const root=chain(n.
   if(s==="done"){buzz([12,40,20]);setTimeout(()=>burstAt(n.id,{n:18,dist:78,size:7}),16)}}
 function addBranch(n){const c=mk("");c.p=nextPos(n.children);n.children.push(c);sel=c.id;fx.born=c.id;fx.selMoved=true;touched();save();render();scrollTo(c.id);focusName()}
 function addRoot(){const r=mk("");r.p=nextPos(roots);roots.push(r);prefs.focus=r.id;first=true;sel=r.id;fx.born=r.id;fx.selMoved=true;touched();save();render();scrollTo(r.id);focusName()}
+/* "Are you sure?" for anything with questions under it. Keep it is the default; Esc or tapping outside cancels. */
+function askConfirm(title,html,yes){return new Promise(res=>{const m=$("#confirm"),prev=document.activeElement;
+  $("#cft").textContent=title;$("#cfd").innerHTML=html;$("#cfyes").textContent=yes;m.hidden=false;buzz(14);
+  const done=v=>{m.hidden=true;document.removeEventListener("keydown",key,true);m.onclick=null;try{prev&&prev.focus&&prev.focus()}catch(e){}res(v)};
+  const key=e=>{if(e.key==="Escape"){e.preventDefault();e.stopPropagation();done(false)}else if(e.key==="Tab"){e.preventDefault();(document.activeElement===$("#cfno")?$("#cfyes"):$("#cfno")).focus()}};
+  document.addEventListener("keydown",key,true);
+  m.onclick=e=>{if(e.target===m)done(false)};$("#cfno").onclick=()=>done(false);$("#cfyes").onclick=()=>done(true);
+  setTimeout(()=>$("#cfno").focus(),0)})}
+async function requestDelete(n){if(!n||!locate(n.id))return;
+  const L=locate(n.id),isRoot=!L.parent,count=below(n).length,name=esc(n.text||(isRoot?"Untitled rabbit hole":"this question"));
+  if(isRoot||count){const what=count?` and the <b>${count} question${count===1?"":"s"}</b> under it`:"";
+    const ok=await askConfirm(isRoot?"Delete this rabbit hole?":"Delete this question?",`<b>“${name}”</b>${what} will be removed from your phone and laptop. You'll still have a few seconds to undo.`,isRoot?"Delete rabbit hole":"Delete");
+    if(!ok)return}
+  del(n)}
 function tombstone(n){const t=Date.now();(function w(x){deleted[x.id]=t;x.children.forEach(w)})(n)}
 function del(n){if(!locate(n.id))return;
   const finish=()=>{const L=locate(n.id);if(!L)return;
@@ -885,7 +916,7 @@ document.addEventListener("keydown",e=>{
   if(e.key==="Tab"){e.preventDefault();addBranch(L.node)}
   else if(e.key===" "){e.preventDefault();setStatus(L.node,ORDER[(ORDER.indexOf(L.node.status)+1)%4])}
   else if(e.key==="F2"){e.preventDefault();focusName()}
-  else if(e.key==="Delete"){e.preventDefault();del(L.node)}
+  else if(e.key==="Delete"){e.preventDefault();requestDelete(L.node)}
 });
 $("#add").onclick=addRoot;
 let rt;addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(()=>{if(prefs.focus)renderPoster()},150)});
@@ -903,7 +934,7 @@ if(shared){ghSchedule(600);toast(shared.text?"Added from share. Edit it into a q
 if("serviceWorker" in navigator&&location.protocol!=="file:"&&!embedded)navigator.serviceWorker.register("sw.js").catch(()=>{});
 
 /* ---------- updates: BUILD changes on every release; a newer one on the server reloads the app ---------- */
-const BUILD="2026.11.18-10";
+const BUILD="2026.11.18-11";
 $("#build").textContent="Version "+BUILD;
 async function checkUpdate(){
   if(location.protocol==="file:"||embedded||!navigator.onLine)return;
