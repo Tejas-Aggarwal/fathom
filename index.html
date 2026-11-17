@@ -153,16 +153,36 @@ svg .frame.slide{animation:frame .35s cubic-bezier(.2,.9,.3,1)}
 .danger{border-color:#FF5A4E!important;color:#FF5A4E}
 .danger.armed{background:#FF5A4E;color:#fff}
 
-/* rabbit-hole switcher */
-.idxbtn{display:flex;align-items:center;gap:7px;min-width:62px;justify-content:center}
+/* home: one tile per rabbit hole */
 .short{display:none}
-.idx{position:absolute;top:12px;left:max(16px,env(safe-area-inset-left,0px));z-index:7;width:min(440px,calc(100% - 32px));max-height:calc(100% - 24px);display:flex;flex-direction:column;background:var(--surface);border-top:6px solid var(--ink);box-shadow:0 0 0 1px var(--ink),10px 10px 0 var(--a);animation:drop .32s cubic-bezier(.2,.9,.3,1)}
-.idxhead{display:flex;gap:8px;align-items:center;padding:10px;border-bottom:2px solid var(--ink)}
-.idxhead input{flex:1;min-width:0;height:38px;border:2px solid var(--ink);background:var(--paper);padding:0 10px;font-size:14px;font-weight:600;color:var(--ink);outline:none}
-.idxhead input:focus{border-color:var(--a)}
-.idxhead input::placeholder{color:var(--grey)}
-.idx .x{width:30px;height:30px;font-size:18px;font-weight:800;color:var(--ink);flex:none}
-.idxlist{overflow:auto;overscroll-behavior:contain;padding:6px 0}
+.home{padding-block:22px 120px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.homebar{margin-bottom:18px;max-width:520px}
+.homebar input{width:100%;height:42px;border:2.5px solid var(--ink);background:var(--surface);padding:0 12px;font-size:14.5px;font-weight:600;color:var(--ink);outline:none;box-shadow:4px 4px 0 var(--ink)}
+.homebar input:focus{border-color:var(--a);box-shadow:4px 4px 0 var(--a)}
+.homebar input::placeholder{color:var(--grey)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(272px,1fr));gap:20px}
+.tile{position:relative;display:grid;grid-template-rows:auto auto 1fr auto;gap:10px;text-align:left;padding:16px 16px 14px;min-height:220px;background:var(--surface);border:2.5px solid var(--ink);box-shadow:5px 5px 0 var(--ink);overflow:hidden;animation:rise .45s cubic-bezier(.2,.9,.3,1) both;transition:transform .14s cubic-bezier(.3,1.6,.5,1),box-shadow .14s}
+.tile:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--ink)}
+.tile:active{transform:translate(4px,4px);box-shadow:1px 1px 0 var(--ink)}
+.tile.live{box-shadow:5px 5px 0 var(--a)}
+.tile.live:hover{box-shadow:7px 7px 0 var(--a)}
+.tn{font-size:66px;font-weight:900;letter-spacing:-.065em;line-height:.78;color:var(--ink)}
+.tile.live .tn{color:var(--a)}
+.tw{position:absolute;top:14px;right:16px;font-size:11px;font-weight:600;color:var(--grey)}
+.tt{font-size:19px;font-weight:800;letter-spacing:-.025em;line-height:1.15;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.ts{font-size:12.5px;font-weight:600;color:var(--ink-2);line-height:1.38;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;align-self:start}
+.ts b{color:var(--ink);font-weight:800}
+.tf{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;border-top:2px solid var(--ink);padding-top:10px}
+.strip{display:flex;flex-wrap:wrap;gap:3px;min-width:0}
+.strip i{width:9px;height:9px;display:block;border:1.5px solid var(--ink);background:var(--surface)}
+.strip i.s-exploring{background:linear-gradient(135deg,transparent 50%,var(--ink) 50%)}
+.strip i.s-done{background:var(--a);border-color:var(--a)}
+.strip i.s-parked{background:var(--grey);border-color:var(--grey)}
+.strip em{font-style:normal;font-size:10.5px;font-weight:700;color:var(--ink-2);line-height:9px}
+.tc{font-size:13px;font-weight:800;white-space:nowrap}
+.homeempty{font-size:15px;font-weight:700;color:var(--ink-2);line-height:1.5}
+.results{background:var(--surface);border:2.5px solid var(--ink);box-shadow:5px 5px 0 var(--ink);max-width:720px;padding:6px 0}
+.back{white-space:nowrap}
 .ir{display:grid;grid-template-columns:46px 1fr auto;align-items:center;gap:10px;width:100%;padding:9px 12px;text-align:left;border-left:5px solid transparent;transition:background-color .12s,transform .12s}
 .ir:hover,.ir:focus-visible{background:var(--paper)}
 .ir:active{transform:translateX(3px)}
@@ -225,7 +245,9 @@ kbd{font-family:var(--face);font-weight:800;font-size:10.5px;border:1.5px solid 
 #toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:70;background:var(--ink);color:var(--paper);font-weight:800;font-size:13px;padding:9px 14px;box-shadow:4px 4px 0 var(--a);animation:toast .35s cubic-bezier(.2,.9,.3,1)}
 @keyframes toast{from{transform:translate(-50%,-140%)}}
 ::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}
-::view-transition-new(root){animation:wipein .6s cubic-bezier(.75,0,.2,1)}
+.vt-wipe::view-transition-new(root){animation:wipein .6s cubic-bezier(.75,0,.2,1)}
+::view-transition-group(hole){animation-duration:.42s;animation-timing-function:cubic-bezier(.2,.9,.3,1)}
+::view-transition-old(hole),::view-transition-new(hole){height:100%;object-fit:cover;object-position:left top}
 @keyframes wipein{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
 html.still *,html.still *::before,html.still *::after{animation:none!important;transition:none!important}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
@@ -238,7 +260,10 @@ html.still *,html.still *::before,html.still *::after{animation:none!important;t
   .long{display:none}
   .short{display:inline}
   .savebtn[data-st="saved"],.savebtn[data-st="local"]{display:none}
-  .idxbtn{min-width:52px}
+  .tiles{grid-template-columns:1fr;gap:16px}
+  .tile{min-height:0}
+  .tn{font-size:50px}
+  .home{padding-block:16px 100px}
   .tb{height:34px;padding:0 10px;font-size:12px}
   .ib input{font-size:18px}
   .chip{padding:7px 5px;font-size:10.5px}
@@ -252,14 +277,18 @@ html.still *,html.still *::before,html.still *::after{animation:none!important;t
     <div class="sum" id="sum"></div>
     <div class="tools">
       <button class="tb savebtn" id="savebtn" data-st="local" title="Saved"><i></i><span id="savetxt"></span></button>
-      <button class="tb idxbtn" id="idxbtn" aria-expanded="false" aria-haspopup="dialog" title="Jump to a rabbit hole ( / )"><span id="idxlabel">All</span><svg width="10" height="6" viewBox="0 0 10 6" aria-hidden="true"><path d="M0 0h10L5 6z" fill="currentColor"/></svg></button>
+      <button class="tb back" id="back" hidden aria-label="Back to all questions">← All</button>
       <button class="tb" id="custom" aria-expanded="false" aria-label="Customize"><span class="long">Customize</span><span class="short">⚙</span></button>
       <button class="tb primary" id="add" aria-label="New question">+ New<span class="long"> question</span></button>
     </div>
   </header>
 
   <div class="field" id="field">
-    <svg id="poster" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Poster of your rabbit holes"></svg>
+    <div class="home" id="home" hidden>
+      <div class="homebar" id="homebar"><input id="homeq" type="search" placeholder="Find a question…" autocomplete="off" spellcheck="false" aria-label="Find a question"></div>
+      <div id="tiles"></div>
+    </div>
+    <svg id="poster" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="This rabbit hole's branches"></svg>
   </div>
 
   <section class="pop" id="pop" hidden aria-label="Customize">
@@ -297,11 +326,6 @@ html.still *,html.still *::before,html.still *::after{animation:none!important;t
         </div>
       </div>
     </div>
-  </section>
-
-  <section class="idx" id="idx" hidden aria-label="Rabbit holes">
-    <div class="idxhead"><input id="idxq" type="search" placeholder="Find a question…" autocomplete="off" spellcheck="false" aria-label="Find a question"><button class="x" id="closeidx" aria-label="Close">×</button></div>
-    <div class="idxlist" id="idxlist"></div>
   </section>
 
   <aside class="insp" id="insp" aria-live="polite"></aside>
@@ -388,7 +412,12 @@ function glyph(s,x,y,z){const h=z/2,w=Math.max(2.5,z*.14),C=T();let g;
 function mini(s,z=16){return`<svg width="${z+4}" height="${z+4}" viewBox="${-(z+4)/2} ${-(z+4)/2} ${z+4} ${z+4}" aria-hidden="true">${glyph(s,0,0,z)}</svg>`}
 
 /* ---------- rendering ---------- */
-function render(){renderPoster();renderMast();renderInsp();fx.pop=fx.born=null;fx.selMoved=fx.chip=false}
+function render(){
+  if(prefs.focus&&!focusRoot())prefs.focus="";
+  const home=!prefs.focus;if(home)sel=null;
+  $("#home").hidden=!home;$("#poster").style.display=home?"none":"";
+  if(home)renderHome();else renderPoster();
+  renderMast();renderInsp();fx.pop=fx.born=null;fx.selMoved=fx.chip=false}
 function renderPoster(){
   const C=T(),f=$("#field"),vw=f.clientWidth||1200,vh=f.clientHeight||700;
   const narrow=vw<600;
@@ -452,35 +481,55 @@ function renderPoster(){
   if(first){svg.classList.add("intro");first=false;setTimeout(()=>svg.classList.remove("intro"),1800)}
 }
 function counts(){const c={all:0,unexplored:0,exploring:0,done:0,parked:0};(function w(l){for(const n of l){c.all++;c[n.status]++;w(n.children)}})(roots);return c}
-/* ---------- switcher: jump between rabbit holes, or search every question ---------- */
+/* ---------- home: tiles; a tile opens into just that rabbit hole ---------- */
 function focusRoot(){return prefs.focus?roots.find(r=>r.id===prefs.focus)||null:null}
 const holeNo=r=>pad(roots.indexOf(r)+1);
-function setFocus(id,selId){prefs.focus=id||"";persistLocal();sel=selId||null;fx.selMoved=!!selId;first=true;closeIdx();render();
-  const f=$("#field");f.scrollTo({left:0,top:0});if(selId)scrollTo(selId)}
-function renderIdx(){const q=$("#idxq").value.trim().toLowerCase(),fr=focusRoot();let h="";
-  if(!q){
-    h=`<button class="ir all" data-f="" aria-current="${!fr}"><span class="n">All</span><span class="t">Every rabbit hole</span><span class="c">${roots.length}</span></button>`;
-    for(const r of [...roots].reverse()){const{t,d}=tally(r);
-      h+=`<button class="ir" data-f="${r.id}" aria-current="${fr===r}"><span class="n">${holeNo(r)}</span><span class="t">${esc(r.text||"Untitled question")}</span><span class="c">${t?d+"/"+t:""}</span></button>`}
-  }else{
+function lastTouch(n){let m=n.u||0;for(const c of n.children)m=Math.max(m,lastTouch(c));return m}
+function below(n){const o=[];(function w(x){for(const c of x.children){o.push(c);w(c)}})(n);return o}
+function tileHTML(r,k){const qs=below(r),{t,d}=tally(r),now=qs.find(n=>n.status==="exploring"),next=qs.find(n=>n.status==="unexplored");
+  const firstNote=(r.note||"").split("\n").find(s=>s.trim());
+  const sub=firstNote?esc(firstNote):now?`<b>Now</b> ${esc(now.text||"Untitled")}`:next?`<b>Next</b> ${esc(next.text||"Untitled")}`:t?"Everything here is explored.":"No branches yet. Open it and branch off.";
+  const strip=qs.slice(0,40).map(n=>`<i class="s-${n.status}"></i>`).join("")+(qs.length>40?`<em>+${qs.length-40}</em>`:"");
+  const touched=lastTouch(r);
+  return`<button class="tile${now||r.status==="exploring"?" live":""}" data-id="${r.id}" style="animation-delay:${Math.min(k,12)*45}ms">
+    <span class="tn">${holeNo(r)}</span>${touched?`<span class="tw">${ago(new Date(touched))}</span>`:""}
+    <span class="tt">${esc(r.text||"Untitled question")}</span><span class="ts">${sub}</span>
+    <span class="tf"><span class="strip" aria-hidden="true">${strip}</span><span class="tc">${t?d+" of "+t+" done":""}</span></span></button>`}
+function renderHome(){const q=$("#homeq").value.trim().toLowerCase(),box=$("#tiles");
+  $("#homebar").hidden=roots.length<=6&&!q;
+  if(q){
     const hits=[];(function w(l,rt){for(const n of l){const root=rt||n;if((n.text||"").toLowerCase().includes(q)||(n.note||"").toLowerCase().includes(q))hits.push({n,root});w(n.children,root)}})(roots,null);
     const hl=s=>{const i=s.toLowerCase().indexOf(q);return i<0?esc(s):esc(s.slice(0,i))+"<mark>"+esc(s.slice(i,i+q.length))+"</mark>"+esc(s.slice(i+q.length))};
-    h=hits.reverse().slice(0,200).map(({n,root})=>`<button class="ir" data-f="${root.id}" data-s="${n.id}"><span class="n">${holeNo(root)}</span><span class="t">${hl(n.text||"Untitled")}${root!==n?`<small>${esc(root.text||"Untitled question")}</small>`:""}</span><span class="c">${mini(n.status,12)}</span></button>`).join("")
-      ||`<p class="idxempty">Nothing matches “${esc($("#idxq").value.trim())}”.</p>`;
-  }
-  $("#idxlist").innerHTML=h}
-function openIdx(){closePop();const p=$("#idx");p.hidden=false;$("#idxbtn").setAttribute("aria-expanded","true");$("#idxq").value="";renderIdx();
-  const cur=$("#idxlist .ir[aria-current=true]");if(cur)cur.scrollIntoView({block:"nearest"});
-  if(matchMedia("(hover: hover)").matches)requestAnimationFrame(()=>$("#idxq").focus())}
-function closeIdx(){$("#idx").hidden=true;$("#idxbtn").setAttribute("aria-expanded","false")}
-$("#idxbtn").onclick=()=>$("#idx").hidden?openIdx():closeIdx();
-$("#closeidx").onclick=closeIdx;
-$("#idxq").oninput=renderIdx;
-$("#idxq").onkeydown=e=>{if(e.key==="Enter"){const b=$("#idxlist .ir");if(b&&$("#idxq").value.trim())b.click()}else if(e.key==="ArrowDown"){const b=$("#idxlist .ir");if(b){e.preventDefault();b.focus()}}};
-$("#idxlist").onclick=e=>{const b=e.target.closest(".ir");if(b)setFocus(b.dataset.f,b.dataset.s||null)};
-$("#idxlist").onkeydown=e=>{if(e.key!=="ArrowDown"&&e.key!=="ArrowUp")return;const all=[...document.querySelectorAll("#idxlist .ir")],i=all.indexOf(document.activeElement);if(i<0)return;e.preventDefault();const t=all[i+(e.key==="ArrowDown"?1:-1)];if(t)t.focus();else if(e.key==="ArrowUp")$("#idxq").focus()};
+    box.className="results";
+    box.innerHTML=hits.reverse().slice(0,200).map(({n,root})=>`<button class="ir" data-f="${root.id}" data-s="${root!==n?n.id:""}"><span class="n">${holeNo(root)}</span><span class="t">${hl(n.text||"Untitled")}${root!==n?`<small>${esc(root.text||"Untitled question")}</small>`:""}</span><span class="c">${mini(n.status,12)}</span></button>`).join("")
+      ||`<p class="idxempty">Nothing matches “${esc($("#homeq").value.trim())}”.</p>`;
+    return}
+  box.className="tiles";
+  const ordered=[...roots].sort((a,b)=>lastTouch(b)-lastTouch(a));
+  box.innerHTML=ordered.map(tileHTML).join("")||`<p class="homeempty">Nothing here yet. Press <b>+ New question</b> and write down the first thing you're curious about.</p>`}
+// Animated view change. If the browser can't start the animation within 0.4 s
+// (no frames being painted), skip it and switch instantly so the app never stalls.
+function vt(nameEl,update,cls){
+  if(still()||!document.startViewTransition){update();return}
+  let ran=false;const run=()=>{if(ran)return;ran=true;if(nameEl)nameEl.style.viewTransitionName="";update()};
+  const root=document.documentElement;if(nameEl)nameEl.style.viewTransitionName="hole";if(cls)root.classList.add(cls);
+  const t=document.startViewTransition(run);
+  const clean=()=>{if(cls)root.classList.remove(cls);document.querySelectorAll("[style*=view-transition-name]").forEach(e=>e.style.viewTransitionName="")};
+  t.finished.then(clean,clean);
+  setTimeout(()=>{if(!ran){try{t.skipTransition()}catch(e){}run();clean()}},400)}
+function openHole(id,selId,fromEl){
+  vt(fromEl,()=>{prefs.focus=id;persistLocal();sel=selId||null;fx.selMoved=!!selId;first=true;render();$("#field").style.viewTransitionName="hole";$("#field").scrollTo(0,0);if(selId)scrollTo(selId)})}
+function goHome(){const was=prefs.focus;if(!was)return;
+  $("#field").style.viewTransitionName="hole";
+  vt(null,()=>{$("#field").style.viewTransitionName="";prefs.focus="";sel=null;persistLocal();$("#homeq").value="";render();$("#field").scrollTo(0,0);
+    const t=document.querySelector(`.tile[data-id="${was}"]`);if(t)t.style.viewTransitionName="hole"})}
+$("#tiles").addEventListener("click",e=>{const t=e.target.closest(".tile");if(t){openHole(t.dataset.id,null,t);return}
+  const b=e.target.closest(".ir");if(b)openHole(b.dataset.f,b.dataset.s||null,null)});
+$("#homeq").oninput=renderHome;
+$("#homeq").onkeydown=e=>{if(e.key==="Enter"){const b=$("#tiles .ir");if(b)b.click()}};
+$("#back").onclick=goHome;
 
-function renderMast(){const c=counts(),fr=focusRoot();$("#idxlabel").textContent=fr?holeNo(fr):"All";
+function renderMast(){const c=counts(),fr=focusRoot();$("#back").hidden=!fr;
   $("#sum").innerHTML=c.all?`<span><b>${c.all}</b> questions</span><span class="hot"><b>${c.exploring}</b> exploring</span><span><b>${c.done}</b> done</span>`:""}
 function renderInsp(){
   const box=$("#insp"),L=sel&&locate(sel);
@@ -517,7 +566,7 @@ function select(id){fx.selMoved=id!==sel;sel=id;render();scrollTo(id)}
 function setStatus(n,s){const was=n.status;if(was===s)return;n.status=s;n.u=Date.now();fx.pop=n.id;fx.chip=true;save();render();
   if(s==="done")requestAnimationFrame(()=>burstAt(n.id,{n:18,dist:78,size:7}));}
 function addBranch(n){const c=mk("");c.p=nextPos(n.children);n.children.push(c);sel=c.id;fx.born=c.id;fx.selMoved=true;touched();save();render();scrollTo(c.id);focusName()}
-function addRoot(){const r=mk("");r.p=nextPos(roots);roots.push(r);if(prefs.focus)prefs.focus=r.id;sel=r.id;fx.born=r.id;fx.selMoved=true;touched();save();render();scrollTo(r.id);focusName()}
+function addRoot(){const r=mk("");r.p=nextPos(roots);roots.push(r);prefs.focus=r.id;first=true;sel=r.id;fx.born=r.id;fx.selMoved=true;touched();save();render();scrollTo(r.id);focusName()}
 function tombstone(n){const t=Date.now();(function w(x){deleted[x.id]=t;x.children.forEach(w)})(n)}
 function del(n){if(!locate(n.id))return;
   const finish=()=>{const L=locate(n.id);if(!L)return;tombstone(L.node);L.list.splice(L.idx,1);sel=L.parent?L.parent.id:(roots[Math.min(L.idx,roots.length-1)]||{}).id||null;fx.selMoved=true;save();render()};
@@ -553,7 +602,7 @@ function save(){persistLocal();
   ghSchedule()}
 async function writeFile(){if(!handle||!fileOK)return;try{setSave("saving");const w=await handle.createWritable();await w.write(JSON.stringify(payload(),replacer,2));await w.close();lastWrite=new Date();setSave("saved",true)}catch(e){fileOK=false;setSave("error")}}
 function setSave(st,flash){saveState=st;paintSave(flash)}
-function ago(d){const s=(Date.now()-d)/1000;return s<50?"just now":s<3600?Math.round(s/60)+" min ago":d.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}
+function ago(d){const s=(Date.now()-d)/1000;return s<50?"just now":s<3600?Math.round(s/60)+" min ago":s<86400?Math.round(s/3600)+" h ago":s<86400*7?Math.round(s/86400)+" d ago":d.toLocaleDateString([],{day:"numeric",month:"short"})}
 function paintSave(flash){const b=$("#savebtn");let st,txt;
   if(ghOn()){st={idle:"saved",pending:"pending",syncing:"saving",error:"error",offline:"reconnect"}[ghState]||"pending";
     txt={idle:"Synced"+(lastSync?" · "+ago(lastSync):""),pending:"Changes waiting…",syncing:"Syncing…",error:"Sync failed",offline:"Offline · will sync"}[ghState]||"Syncing…"}
@@ -626,7 +675,8 @@ async function ghPut(data,sha){const body={message:`Sync from ${gh.device||"a de
   if(!r.ok)throw await ghErr(r)}
 function applyMerged(m){roots=normalize(m.roots);deleted=m.deleted;if(sel&&!locate(sel))sel=null;persistLocal();
   const typing=document.activeElement&&document.activeElement.closest&&document.activeElement.closest("#insp");
-  renderPoster();renderMast();if(!typing)renderInsp()}
+  if(prefs.focus&&!focusRoot()){prefs.focus="";render();return}
+  if(prefs.focus)renderPoster();else renderHome();renderMast();if(!typing)renderInsp()}
 async function sync(){if(!ghOn())return;if(syncing){syncAgain=true;return}
   clearTimeout(syncT);
   if(!navigator.onLine){ghState="offline";paintSave();return}
@@ -683,12 +733,12 @@ function applyPrefs(){
   set("guides",prefs.guides);set("huge",prefs.huge);set("axis",prefs.axis);set("motion",prefs.motion);
 }
 function restyle(fn){const go=()=>{fn();applyPrefs();save();render()};
-  if(!still()&&document.startViewTransition)document.startViewTransition(go);else go()}
+  vt(null,go,"vt-wipe")}
 $("#themes").onclick=e=>{const b=e.target.closest("button");if(b&&b.dataset.v!==prefs.theme)restyle(()=>prefs.theme=b.dataset.v)};
 $("#spots").onclick=e=>{const b=e.target.closest("button");if(b)restyle(()=>prefs.spot=b.dataset.v)};
 const opt=(id,k)=>$("#"+id).onclick=e=>{const b=e.target.closest("button");if(b){prefs[k]=b.dataset.v==="1";applyPrefs();save();render()}};
 opt("guides","guides");opt("huge","huge");opt("axis","axis");opt("motion","motion");
-function openPop(toData){closeIdx();const p=$("#pop");p.hidden=false;$("#custom").setAttribute("aria-expanded","true");if(toData)requestAnimationFrame(()=>$("#data").scrollIntoView({block:"nearest"}))}
+function openPop(toData){const p=$("#pop");p.hidden=false;$("#custom").setAttribute("aria-expanded","true");if(toData)requestAnimationFrame(()=>$("#data").scrollIntoView({block:"nearest"}))}
 function closePop(){$("#pop").hidden=true;$("#custom").setAttribute("aria-expanded","false")}
 $("#custom").onclick=()=>$("#pop").hidden?openPop():closePop();
 $("#closepop").onclick=closePop;
@@ -697,8 +747,9 @@ $("#closepop").onclick=closePop;
 $("#poster").addEventListener("click",e=>{const g=e.target.closest(".nd,.nd-t");if(g)select(g.dataset.id)});
 $("#poster").addEventListener("keydown",e=>{const g=e.target.closest&&e.target.closest(".nd");if(g&&e.key==="Enter"){e.preventDefault();select(g.dataset.id)}});
 document.addEventListener("keydown",e=>{
-  if(e.key==="Escape"){if(!$("#idx").hidden)closeIdx();else if(!$("#pop").hidden)closePop();else if(sel&&!(e.target.matches&&e.target.matches("input,textarea"))){sel=null;render()}}
-  if(e.key==="/"&&!(e.target.matches&&e.target.matches("input,textarea"))){e.preventDefault();openIdx();return}
+  const typing=e.target.matches&&e.target.matches("input,textarea");
+  if(e.key==="Escape"){if(!$("#pop").hidden)closePop();else if(typing)e.target.blur();else if(sel){sel=null;render()}else if(prefs.focus)goHome();return}
+  if(e.key==="/"&&!typing){e.preventDefault();const find=()=>{$("#homebar").hidden=false;$("#homeq").focus()};if(prefs.focus){goHome();setTimeout(find,450)}else find();return}
   if(!sel)return;const t=e.target;
   if(t.matches&&t.matches("input,textarea,select"))return;
   if(t!==document.body&&!(t.closest&&t.closest("#field")))return;
@@ -709,7 +760,7 @@ document.addEventListener("keydown",e=>{
   else if(e.key==="Delete"){e.preventDefault();del(L.node)}
 });
 $("#add").onclick=addRoot;
-let rt;addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(renderPoster,150)});
+let rt;addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(()=>{if(prefs.focus)renderPoster()},150)});
 applyPrefs();render();setSave("local");initFile();initGh();
 if("serviceWorker" in navigator&&location.protocol!=="file:"&&!embedded)navigator.serviceWorker.register("sw.js").catch(()=>{});
 </script>
